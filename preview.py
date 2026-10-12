@@ -46,7 +46,18 @@ def main():
     parser = argparse.ArgumentParser(description="Preview Kinetic Canvas art and sound transitions.")
     parser.add_argument(
         "--mode",
-        choices=["cycle", "mondrian", "game_of_life", "wolfram", "weather", "zen_chime"],
+        choices=[
+            "cycle",
+            "zen_snap",
+            "zen_wave",
+            "zen_rain",
+            "zen_gong",
+            "mondrian",
+            "game_of_life",
+            "wolfram",
+            "weather",
+            "zen_chime",
+        ],
         default="cycle",
         help="Art and acoustic mode to preview (default: cycle)",
     )

@@ -1,7 +1,7 @@
 {
   "id": "kinetic_canvas",
   "name": "Kinetic Canvas & Acoustic Art",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "Abstract generative art and kinetic split-flap acoustic soundscapes for Vestaboard Note and Flagship.",
   "author": "Sneakamaila",
   "icon": "palette",
@@ -18,6 +18,10 @@
         "default": "cycle",
         "enum": [
           "cycle",
+          "zen_snap",
+          "zen_wave",
+          "zen_rain",
+          "zen_gong",
           "mondrian",
           "game_of_life",
           "wolfram",
@@ -25,12 +29,16 @@
           "zen_chime"
         ],
         "enumNames": [
-          "Exhibition Cycle (All Styles)",
-          "Mondrian & De Stijl (Primary Color Fields)",
-          "Conway's Game of Life (Cellular Automata)",
-          "Wolfram 1D Automata (Rule 30/90/110)",
-          "Weather Resonance (Live Weather)",
-          "Zen Chime & Sound Sculptures (Acoustic Envelopes)"
+          "Ausstellungs-Zyklus (Wechselt alle Stile)",
+          "Staccato Snap (Synchroner Farbsprung, Δ=1)",
+          "Klangwelle (Spektraler Stereo-Sweep)",
+          "Nachtregen (Sanftes Klick-Prasseln)",
+          "Resonanz-Mandala (Klangschale)",
+          "Mondrian & De Stijl (Farbflaechen)",
+          "Conway's Game of Life (Lebende Zellen)",
+          "Wolfram 1D Automaten (Muster-Teppiche)",
+          "Wetter-Resonanz (Live-Wetter Kunst)",
+          "Zen Chime (Alle Klangskulpturen im Wechsel)"
         ]
       },
       "display_layout": {
@@ -176,7 +184,7 @@
         "description": "ASCII sparkline of acoustic activity across board columns",
         "type": "string",
         "group": "acoustics",
-        "example": " ▂▄▆█▆▄▂ "
+        "example": "..-==#==--.."
       },
       "acoustic_description": {
         "description": "Human-readable acoustic score summary",

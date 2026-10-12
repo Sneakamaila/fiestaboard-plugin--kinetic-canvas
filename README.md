@@ -53,11 +53,12 @@ $$\Delta = (\text{Target} - \text{Start}) \pmod{N_{\text{flaps}}}$$
 * **Acoustics:** Wind speed modulates column turbulence; precipitation rate modulates mechanical droplet frequency. Includes an instant demo/offline fallback.
 
 ### 5. 🔔 Zen Chime & Sound Sculptures
-* **Acoustic Envelopes:** Specifically engineers board transitions around intentional acoustic soundscapes:
-  * `staccato_snap`: Synchronous unison click ($\Delta = 1$) of all flaps.
-  * `acoustic_wave`: Left-to-right sweeping stereo pan.
-  * `rainfall`: Sparse, stochastic rain patter across 15–20% of modules.
-  * `harmonic_decay`: Ringing center resonance with fast-decaying edges.
+* **Pure Abstract Color Art:** Every sound sculpture generates pure geometric color compositions (Bauhaus concentric frames, diagonal prisms, minimalist night drizzle, sacred mandalas) using the physical color chips (`{63}` through `{70}`). Zero plain letters or wall of text.
+* **Direct Modes / Sound Envelopes:**
+  * `zen_snap`: **Staccato Snap ($\Delta = 1$):** Pure Bauhaus color frames advancing synchronously in the drum's contiguous color ring. All 132 modules click in unison (~35 ms) like a mechanical whip-crack.
+  * `zen_wave`: **Klangwelle:** Flowing diagonal rainbow prism with acoustic stereo-sweep from left to right.
+  * `zen_rain`: **Nachtregen:** Minimalist night sky on deep Black (`{70}`) with Blue (`{67}`) and White (`{69}`) droplets clicking softly like rain against glass.
+  * `zen_gong`: **Resonanz-Mandala:** Radiating color mandala where outer edges stay silent while the core resonates.
 
 ### 6. 🔄 Exhibition Cycle (`cycle`)
 * Automatically rotates through all art and acoustic styles on every refresh interval.
@@ -69,11 +70,11 @@ $$\Delta = (\text{Target} - \text{Start}) \pmod{N_{\text{flaps}}}$$
 You can preview the visual canvases in full ANSI 24-bit TrueColor and inspect acoustic telemetry directly in your terminal:
 
 ```bash
+# Direct Staccato Snap test (consecutive delta=1 transitions)
+python preview.py --mode zen_snap --steps 4
+
 # Preview Mondrian
 python preview.py --mode mondrian
-
-# Preview Zen Chime Staccato Snap
-python preview.py --mode zen_chime --chime-style staccato_snap
 
 # Preview Game of Life evolution
 python preview.py --mode game_of_life --steps 5
@@ -88,9 +89,9 @@ python preview.py --mode weather
 
 | Setting | Type | Default | Description |
 |---|---|---|---|
-| `mode` | string | `"cycle"` | `"cycle"`, `"mondrian"`, `"game_of_life"`, `"wolfram"`, `"weather"`, `"zen_chime"` |
+| `mode` | string | `"cycle"` | `"cycle"`, `"zen_snap"`, `"zen_wave"`, `"zen_rain"`, `"zen_gong"`, `"mondrian"`, `"game_of_life"`, `"wolfram"`, `"weather"`, `"zen_chime"` |
 | `display_layout` | string | `"full_canvas"` | `"full_canvas"` (100% art) or `"canvas_with_info"` (art + title & sound waveform) |
-| `chime_style` | string | `"cycle"` | `"cycle"`, `"staccato_snap"`, `"acoustic_wave"`, `"rainfall"`, `"harmonic_decay"` |
+| `chime_style` | string | `"cycle"` | Sub-envelope if `zen_chime` is selected (`"cycle"`, `"staccato_snap"`, `"acoustic_wave"`, `"rainfall"`, `"harmonic_decay"`) |
 | `wolfram_rule` | integer | `30` | `30` (Chaotic), `90` (Sierpinski), `110` (Complex), `184` (Traffic) |
 | `city_name` | string | `"Berlin"` | Location display name for weather |
 | `latitude` | number | `52.52` | Latitude for Open-Meteo weather API |

@@ -91,6 +91,50 @@ def test_zen_chime_all_styles():
         assert res.metadata["chime_style"] == style
 
 
+def test_zen_chime_snap_unison_physics():
+    """Verify that a consecutive snap transition yields max_clicks == 1 for all 132 modules."""
+    from plugins.kinetic_canvas.acoustics import compute_acoustic_score
+
+    gen = ZenChimeGenerator()
+    state = {}
+    # Turn 1: Setup phase
+    res1 = gen.generate(None, None, {"chime_style": "staccato_snap"}, state)
+    # Turn 2: Snap #1 (every tile advances by exactly 1 step)
+    res2 = gen.generate(res1.flagship_matrix, res1.note_matrix, {"chime_style": "staccato_snap"}, state)
+
+    score = compute_acoustic_score(res1.flagship_matrix, res2.flagship_matrix)
+    assert score.max_clicks == 1
+    assert score.total_clicks == FLAGSHIP_WIDTH * FLAGSHIP_HEIGHT
+    assert score.moving_modules == FLAGSHIP_WIDTH * FLAGSHIP_HEIGHT
+    assert score.intensity == "Snap"
+    assert "Peitschenschlag" in score.description
+
+
+def test_zen_chime_pure_color_no_letters():
+    """Ensure Zen Chime uses only colors (63..70) or blank (0), and never plain letters (1..26)."""
+    gen = ZenChimeGenerator()
+    state = {}
+    for style in ["staccato_snap", "acoustic_wave", "rainfall", "harmonic_decay"]:
+        res = gen.generate(None, None, {"chime_style": style}, state)
+        for row in res.flagship_matrix:
+            for code in row:
+                # Must be color (63..70) or blank (0)
+                assert code == 0 or 63 <= code <= 70, f"Found illegal character code {code} in {style}"
+
+
+def test_direct_zen_mode_aliases():
+    """Ensure zen_snap, zen_wave, zen_rain, zen_gong invoke the correct sound profile directly."""
+    for alias, expected_style in [
+        ("zen_snap", "staccato_snap"),
+        ("zen_wave", "acoustic_wave"),
+        ("zen_rain", "rainfall"),
+        ("zen_gong", "harmonic_decay"),
+    ]:
+        res = run_generator(alias, None, None, {}, {})
+        assert res.metadata["active_mode"] == alias
+        assert res.metadata["chime_style"] == expected_style
+
+
 def test_registry_cycle_mode():
     state = {}
     modes_seen = []
@@ -100,3 +144,4 @@ def test_registry_cycle_mode():
 
     # Cycle should rotate between different generators
     assert len(set(modes_seen)) >= 4
+

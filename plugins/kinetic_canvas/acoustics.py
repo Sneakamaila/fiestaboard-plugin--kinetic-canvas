@@ -141,6 +141,9 @@ def compute_acoustic_score(
     if total_clicks == 0:
         intensity = "Silent"
         description = "Statische Ruhe — keine Module in Bewegung."
+    elif max_clicks == 1 and moving_modules >= 20:
+        intensity = "Snap"
+        description = f"Präziser Stakkato-Peitschenschlag ({moving_modules} Module simultan, 1 Klick, ~{estimated_duration_sec:.2f}s)."
     elif total_clicks <= 150:
         intensity = "Whisper"
         description = f"Zarte Pianissimo-Klicks ({total_clicks} Klicks, ~{estimated_duration_sec:.1f}s)."
