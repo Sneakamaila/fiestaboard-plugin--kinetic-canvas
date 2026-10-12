@@ -60,9 +60,3 @@ if "src.plugins.base" not in sys.modules:
     sys.modules["src"] = src_mod
     sys.modules["src.plugins"] = src_plugins_mod
     sys.modules["src.plugins.base"] = src_plugins_base_mod
-
-
-@pytest.fixture
-def temp_state_file(tmp_path: Path):
-    """Provide an isolated temporary state file for testing."""
-    return tmp_path / ".kinetic_canvas_state_test.json"
