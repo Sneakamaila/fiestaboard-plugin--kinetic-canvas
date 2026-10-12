@@ -24,7 +24,7 @@ def test_validate_config(manifest_data):
     plugin = KineticCanvasPlugin(manifest_data)
 
     # Valid config
-    errors = plugin.validate_config({"mode": "mondrian", "quiet_hours_start": "22:00", "quiet_hours_end": "07:00"})
+    errors = plugin.validate_config({"mode": "mondrian", "display_layout": "full_canvas"})
     assert errors == []
 
     # Invalid mode
@@ -32,17 +32,16 @@ def test_validate_config(manifest_data):
     assert len(errors) == 1
     assert "Invalid mode" in errors[0]
 
-    # Invalid quiet hours
-    errors = plugin.validate_config({"quiet_hours_start": "25:00"})
+    # Invalid display layout
+    errors = plugin.validate_config({"display_layout": "invalid_layout"})
     assert len(errors) == 1
-    assert "Invalid quiet_hours_start" in errors[0]
+    assert "Invalid display_layout" in errors[0]
 
 
 def test_fetch_data_mondrian(manifest_data):
     plugin = KineticCanvasPlugin(manifest_data)
     plugin.config = {
         "mode": "mondrian",
-        "quiet_hours_enabled": False,
         "seed": 1234,
     }
 
@@ -60,7 +59,6 @@ def test_fetch_data_cycle(manifest_data):
     plugin = KineticCanvasPlugin(manifest_data)
     plugin.config = {
         "mode": "cycle",
-        "quiet_hours_enabled": False,
         "demo_mode": True,
     }
 
@@ -74,43 +72,24 @@ def test_fetch_data_cycle(manifest_data):
     assert res2.data["mode"] != res1.data["mode"]
 
 
-def test_fetch_data_quiet_hours_active(manifest_data, monkeypatch):
-    import datetime
+def test_fetch_data_canvas_with_info(manifest_data):
     plugin = KineticCanvasPlugin(manifest_data)
     plugin.config = {
         "mode": "mondrian",
-        "quiet_hours_enabled": True,
-        "quiet_hours_start": "22:00",
-        "quiet_hours_end": "07:00",
-        "quiet_mode_behavior": "silent_hold",
+        "display_layout": "canvas_with_info",
     }
 
-    # Simulate night time 23:30
-    fake_now = datetime.datetime(2026, 10, 12, 23, 30)
-
-    # Test fetch_data with check_quiet_hours patched or state pre-seeded
-    plugin.state_manager.save({
-        "previous_flagship": [[63 for _ in range(22)] for _ in range(6)],
-        "previous_note": [[63 for _ in range(15)] for _ in range(3)],
-    })
-
-    # Mock datetime.datetime.now
-    class FakeDatetime(datetime.datetime):
-        @classmethod
-        def now(cls, tz=None):
-            return fake_now
-
-    monkeypatch.setattr(datetime, "datetime", FakeDatetime)
-
-    res = plugin.fetch_data()
-    assert res.available is True
-    assert res.data["is_quiet_hours"] == "YES"
-    assert res.data["total_clicks"] == 0  # Absolute silence!
+    result = plugin.fetch_data()
+    assert result.available is True
+    assert result.data is not None
+    # Row 5 contains centered title
+    assert result.data["flagship_line5"].strip() != ""
+    # Row 6 contains clicks info
+    assert "CLKS" in result.data["flagship_line6"]
 
 
 def test_fetch_data_exception_handling(manifest_data, monkeypatch):
     plugin = KineticCanvasPlugin(manifest_data)
-    plugin.config = {"quiet_hours_enabled": False}
 
     def broken_generator(*args, **kwargs):
         raise RuntimeError("Simulated generator failure")
@@ -119,4 +98,3 @@ def test_fetch_data_exception_handling(manifest_data, monkeypatch):
     result = plugin.fetch_data()
     assert result.available is False
     assert "Kinetic Canvas Error" in result.error
-

@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 import logging
-import os
 from typing import Any, Dict, List, Optional
 
 try:
@@ -52,7 +51,6 @@ from .constants import (
 )
 from .formatters import build_plugin_variables
 from .generators.registry import AVAILABLE_GENERATORS, run_generator
-from .quiet_hours import check_quiet_hours, parse_time_str
 from .state_manager import StateManager
 
 logger = logging.getLogger(__name__)
@@ -82,14 +80,6 @@ class KineticCanvasPlugin(PluginBase):
         if layout not in ("full_canvas", "canvas_with_info"):
             errors.append(f"Invalid display_layout '{layout}'. Choose 'full_canvas' or 'canvas_with_info'.")
 
-        if config.get("quiet_hours_enabled", True):
-            start = config.get("quiet_hours_start", "22:00")
-            end = config.get("quiet_hours_end", "07:00")
-            if not parse_time_str(start):
-                errors.append(f"Invalid quiet_hours_start '{start}'. Must be HH:MM format.")
-            if not parse_time_str(end):
-                errors.append(f"Invalid quiet_hours_end '{end}'. Must be HH:MM format.")
-
         return errors
 
     def fetch_data(self) -> PluginResult:
@@ -101,46 +91,20 @@ class KineticCanvasPlugin(PluginBase):
             prev_flagship = state.get("previous_flagship")
             prev_note = state.get("previous_note")
 
-            # 1. Quiet Hours Check
-            is_quiet, f_override, n_override, quiet_msg = check_quiet_hours(
-                cfg, prev_flagship, prev_note
-            )
-
-            if is_quiet and f_override is not None and n_override is not None:
-                # Calculate acoustic score for override (typically 0 clicks for silent hold)
-                score = compute_acoustic_score(prev_flagship, f_override)
-
-                # Persist state
-                state["previous_flagship"] = f_override
-                state["previous_note"] = n_override
-                self.state_manager.save(state)
-
-                data = build_plugin_variables(
-                    flagship_matrix=f_override,
-                    note_matrix=n_override,
-                    score=score,
-                    title="Nachtruhe (Stille)",
-                    description=quiet_msg,
-                    active_mode="quiet_hours",
-                    is_quiet=True,
-                    extra_metadata={},
-                )
-                return PluginResult(available=True, data=data)
-
-            # 2. Active Mode Generation
+            # 1. Active Mode Generation
             mode = cfg.get("mode", "cycle")
             result = run_generator(mode, prev_flagship, prev_note, cfg, state)
 
-            # 3. Acoustic Physics Computation
+            # 2. Acoustic Physics Computation
             score = compute_acoustic_score(prev_flagship, result.flagship_matrix)
 
-            # 4. State Persistence
+            # 3. State Persistence
             state["previous_flagship"] = result.flagship_matrix
             state["previous_note"] = result.note_matrix
             state["generation_count"] = state.get("generation_count", 0) + 1
             self.state_manager.save(state)
 
-            # 5. Build Template Variables
+            # 4. Build Template Variables
             layout = cfg.get("display_layout", "full_canvas")
             data = build_plugin_variables(
                 flagship_matrix=result.flagship_matrix,
@@ -149,7 +113,6 @@ class KineticCanvasPlugin(PluginBase):
                 title=result.title,
                 description=result.description,
                 active_mode=result.metadata.get("active_mode", mode),
-                is_quiet=False,
                 extra_metadata=result.metadata,
                 layout=layout,
             )

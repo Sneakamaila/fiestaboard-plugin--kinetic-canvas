@@ -104,35 +104,6 @@
         "description": "Simulate atmospheric weather data without internet requests.",
         "default": false
       },
-      "quiet_hours_enabled": {
-        "type": "boolean",
-        "title": "Enable Quiet Hours (Nachtruhe)",
-        "description": "Silence or dampen acoustic flap movements during nighttime hours.",
-        "default": true
-      },
-      "quiet_hours_start": {
-        "type": "string",
-        "title": "Quiet Hours Start (HH:MM)",
-        "description": "Start time for night silence (24h format, e.g. 22:00).",
-        "default": "22:00"
-      },
-      "quiet_hours_end": {
-        "type": "string",
-        "title": "Quiet Hours End (HH:MM)",
-        "description": "End time for night silence (24h format, e.g. 07:00).",
-        "default": "07:00"
-      },
-      "quiet_mode_behavior": {
-        "type": "string",
-        "title": "Quiet Mode Behavior",
-        "description": "Action when quiet hours are active.",
-        "default": "silent_hold",
-        "enum": ["silent_hold", "blank"],
-        "enumNames": [
-          "Silent Hold (Freeze current artwork, 0 clicks)",
-          "Blank (Turn to blank black canvas)"
-        ]
-      },
       "refresh_seconds": {
         "type": "integer",
         "title": "Refresh Interval (seconds)",
@@ -176,12 +147,6 @@
         "type": "string",
         "group": "art",
         "example": "Mondrian-Komposition mit primären Farbfeldern"
-      },
-      "is_quiet_hours": {
-        "description": "Whether quiet hours are currently suppressing sound (YES or NO)",
-        "type": "string",
-        "group": "art",
-        "example": "NO"
       },
       "sound_profile": {
         "description": "Acoustic intensity category (Silent, Whisper, Rainfall, Crescendo, Thunder)",

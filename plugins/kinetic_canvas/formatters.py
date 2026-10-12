@@ -66,7 +66,6 @@ def build_plugin_variables(
     title: str,
     description: str,
     active_mode: str,
-    is_quiet: bool,
     extra_metadata: Dict[str, Any],
     layout: str = "full_canvas",
 ) -> Dict[str, Any]:
@@ -101,7 +100,6 @@ def build_plugin_variables(
         "title": title,
         "mode": active_mode,
         "description": description,
-        "is_quiet_hours": "YES" if is_quiet else "NO",
 
         # Acoustic score telemetry
         "sound_profile": score.intensity,

@@ -64,17 +64,6 @@ $$\Delta = (\text{Target} - \text{Start}) \pmod{N_{\text{flaps}}}$$
 
 ---
 
-## 🌙 Sound Dampening & Quiet Hours (Nachtruhe)
-
-Because mechanical split-flap movements are acoustic by nature, **Kinetic Canvas** features built-in quiet hours protection:
-
-* **Configurable Window:** e.g., `22:00` to `07:00` (supports overnight spans).
-* **Behaviors:**
-  * `silent_hold`: Freezes the currently displayed canvas. **Exactly 0 clicks generated.**
-  * `blank`: Turns the board to dark blank tiles once and remains completely silent.
-
----
-
 ## 🖥️ Live Terminal Previewer & Acoustic Simulator
 
 You can preview the visual canvases in full ANSI 24-bit TrueColor and inspect acoustic telemetry directly in your terminal:
@@ -100,17 +89,16 @@ python preview.py --mode weather
 | Setting | Type | Default | Description |
 |---|---|---|---|
 | `mode` | string | `"cycle"` | `"cycle"`, `"mondrian"`, `"game_of_life"`, `"wolfram"`, `"weather"`, `"zen_chime"` |
+| `display_layout` | string | `"full_canvas"` | `"full_canvas"` (100% art) or `"canvas_with_info"` (art + title & sound waveform) |
 | `chime_style` | string | `"cycle"` | `"cycle"`, `"staccato_snap"`, `"acoustic_wave"`, `"rainfall"`, `"harmonic_decay"` |
 | `wolfram_rule` | integer | `30` | `30` (Chaotic), `90` (Sierpinski), `110` (Complex), `184` (Traffic) |
 | `city_name` | string | `"Berlin"` | Location display name for weather |
 | `latitude` | number | `52.52` | Latitude for Open-Meteo weather API |
 | `longitude` | number | `13.405` | Longitude for Open-Meteo weather API |
 | `demo_mode` | boolean | `false` | Enable simulated weather without network requests |
-| `quiet_hours_enabled`| boolean | `true` | Suppress mechanical sound during sleep hours |
-| `quiet_hours_start` | string | `"22:00"` | 24h start time (HH:MM) |
-| `quiet_hours_end` | string | `"07:00"` | 24h end time (HH:MM) |
-| `quiet_mode_behavior` | string | `"silent_hold"` | `"silent_hold"` (freeze, 0 clicks) or `"blank"` |
 | `refresh_seconds` | integer | `300` | Refresh interval (minimum 30s to preserve motors) |
+
+> **Night Mode & Quiet Hours:** Scheduling and muting during sleep hours is handled natively by FiestaBoard's global board scheduler.
 
 ---
 

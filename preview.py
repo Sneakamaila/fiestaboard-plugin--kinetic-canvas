@@ -68,7 +68,6 @@ def main():
         "chime_style": args.chime_style,
         "wolfram_rule": args.rule,
         "demo_mode": True,
-        "quiet_hours_enabled": False,
     }
 
     print("=" * 60)

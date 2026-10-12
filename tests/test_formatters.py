@@ -60,7 +60,6 @@ def test_build_plugin_variables():
         title="Test Title",
         description="Test Desc",
         active_mode="mondrian",
-        is_quiet=False,
         extra_metadata={"custom_val": 42},
     )
 
@@ -70,8 +69,8 @@ def test_build_plugin_variables():
     assert data["total_clicks"] == 100
     assert data["flagship_line1"] == "{63}" * FLAGSHIP_WIDTH
     assert data["note_line1"] == "{63}" * NOTE_WIDTH
-    assert data["is_quiet_hours"] == "NO"
     assert data["meta_custom_val"] == 42
+
 
 def test_build_plugin_variables_canvas_with_info():
     f_mat = [[COLOR_RED for _ in range(FLAGSHIP_WIDTH)] for _ in range(FLAGSHIP_HEIGHT)]
@@ -96,7 +95,6 @@ def test_build_plugin_variables_canvas_with_info():
         title="Zen Chime Wave",
         description="Sound wave",
         active_mode="zen_chime",
-        is_quiet=False,
         extra_metadata={},
         layout="canvas_with_info",
     )
