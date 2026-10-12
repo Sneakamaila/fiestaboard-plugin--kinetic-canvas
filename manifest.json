@@ -1,7 +1,7 @@
 {
   "id": "kinetic_canvas",
   "name": "Kinetic Canvas & Acoustic Art",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Abstract generative art and kinetic split-flap acoustic soundscapes for Vestaboard Note and Flagship.",
   "author": "Sneakamaila",
   "icon": "palette",
@@ -31,6 +31,20 @@
           "Wolfram 1D Automata (Rule 30/90/110)",
           "Weather Resonance (Live Weather)",
           "Zen Chime & Sound Sculptures (Acoustic Envelopes)"
+        ]
+      },
+      "display_layout": {
+        "type": "string",
+        "title": "Board Layout Preset",
+        "description": "Choose whether the board shows pure full-screen art or includes title & sound telemetry.",
+        "default": "full_canvas",
+        "enum": [
+          "full_canvas",
+          "canvas_with_info"
+        ],
+        "enumNames": [
+          "Pure Full-Screen Canvas (100% Abstract Art)",
+          "Art Canvas with Sound Badge (Art + Title & Acoustic Waveform)"
         ]
       },
       "chime_style": {
@@ -249,7 +263,141 @@
         "description": "Line 3 formatted for Vestaboard Note (15 tiles)",
         "type": "string",
         "group": "note"
+      },
+      "canvas_flagship_line1": {
+        "description": "Full canvas Line 1 for Vestaboard Flagship (always pure art)",
+        "type": "string",
+        "group": "flagship"
+      },
+      "canvas_flagship_line2": {
+        "description": "Full canvas Line 2 for Vestaboard Flagship (always pure art)",
+        "type": "string",
+        "group": "flagship"
+      },
+      "canvas_flagship_line3": {
+        "description": "Full canvas Line 3 for Vestaboard Flagship (always pure art)",
+        "type": "string",
+        "group": "flagship"
+      },
+      "canvas_flagship_line4": {
+        "description": "Full canvas Line 4 for Vestaboard Flagship (always pure art)",
+        "type": "string",
+        "group": "flagship"
+      },
+      "canvas_flagship_line5": {
+        "description": "Full canvas Line 5 for Vestaboard Flagship (always pure art)",
+        "type": "string",
+        "group": "flagship"
+      },
+      "canvas_flagship_line6": {
+        "description": "Full canvas Line 6 for Vestaboard Flagship (always pure art)",
+        "type": "string",
+        "group": "flagship"
+      },
+      "canvas_note_line1": {
+        "description": "Full canvas Line 1 for Vestaboard Note (always pure art)",
+        "type": "string",
+        "group": "note"
+      },
+      "canvas_note_line2": {
+        "description": "Full canvas Line 2 for Vestaboard Note (always pure art)",
+        "type": "string",
+        "group": "note"
+      },
+      "canvas_note_line3": {
+        "description": "Full canvas Line 3 for Vestaboard Note (always pure art)",
+        "type": "string",
+        "group": "note"
       }
+    }
+  },
+  "teaser": "{63}{65}{67} KINETIC CANVAS",
+  "previews": [
+    {
+      "label": "Mondrian (Flagship)",
+      "device_type": "flagship",
+      "rows": [
+        "{70}{70}{63}{63}{63}{70}{69}{69}{69}{69}{70}{67}{67}{67}{67}{70}{69}{69}{69}{69}{70}{70}",
+        "{70}{70}{63}{63}{63}{70}{69}{69}{69}{69}{70}{67}{67}{67}{67}{70}{69}{69}{69}{69}{70}{70}",
+        "{70}{70}{70}{70}{70}{70}{70}{70}{70}{70}{70}{70}{70}{70}{70}{70}{70}{70}{70}{70}{70}{70}",
+        "{70}{70}{69}{69}{69}{70}{65}{65}{65}{65}{70}{69}{69}{69}{69}{70}{63}{63}{63}{63}{70}{70}",
+        "{70}{70}{69}{69}{69}{70}{65}{65}{65}{65}{70}{69}{69}{69}{69}{70}{63}{63}{63}{63}{70}{70}",
+        "{70}{70}{70}{70}{70}{70}{70}{70}{70}{70}{70}{70}{70}{70}{70}{70}{70}{70}{70}{70}{70}{70}"
+      ]
+    },
+    {
+      "label": "Zen Chime + Badge (Flagship)",
+      "device_type": "flagship",
+      "rows": [
+        "{63}{64}{65}{66}{67}{68}{69}{70}{63}{64}{65}{66}{67}{68}{69}{70}{63}{64}{65}{66}{67}{68}",
+        "{64}{65}{66}{67}{68}{69}{70}{63}{64}{65}{66}{67}{68}{69}{70}{63}{64}{65}{66}{67}{68}{69}",
+        "{65}{66}{67}{68}{69}{70}{63}{64}{65}{66}{67}{68}{69}{70}{63}{64}{65}{66}{67}{68}{69}{70}",
+        "{66}{67}{68}{69}{70}{63}{64}{65}{66}{67}{68}{69}{70}{63}{64}{65}{66}{67}{68}{69}{70}{63}",
+        "  ZEN CHIME : WAVE    ",
+        " [ ▂▄▆█▆▄▂ ] 412 CLKS "
+      ]
+    },
+    {
+      "label": "Mondrian (Note)",
+      "device_type": "note",
+      "rows": [
+        "{63}{63}{63}{63}{70}{69}{69}{69}{69}{69}{70}{67}{67}{67}{67}",
+        "{70}{70}{70}{70}{70}{70}{70}{70}{70}{70}{70}{70}{70}{70}{70}",
+        "{69}{69}{69}{69}{70}{65}{65}{65}{65}{65}{70}{69}{69}{69}{69}"
+      ]
+    },
+    {
+      "label": "Game of Life (Note)",
+      "device_type": "note",
+      "rows": [
+        "   {65}   {66}{66}   {67}  ",
+        "  {66}{66}   {65}   {68}{68} ",
+        "   {67}   {66}{66}   {65}  "
+      ]
+    }
+  ],
+  "demo": {
+    "flagship": {
+      "name": "Kinetic Canvas",
+      "config": {
+        "mode": "cycle",
+        "display_layout": "full_canvas",
+        "refresh_seconds": 300
+      },
+      "template": [
+        "{{kinetic_canvas.flagship_line1}}",
+        "{{kinetic_canvas.flagship_line2}}",
+        "{{kinetic_canvas.flagship_line3}}",
+        "{{kinetic_canvas.flagship_line4}}",
+        "{{kinetic_canvas.flagship_line5}}",
+        "{{kinetic_canvas.flagship_line6}}"
+      ],
+      "line_metadata": [
+        { "alignment": "left", "wrap": false },
+        { "alignment": "left", "wrap": false },
+        { "alignment": "left", "wrap": false },
+        { "alignment": "left", "wrap": false },
+        { "alignment": "left", "wrap": false },
+        { "alignment": "left", "wrap": false }
+      ]
+    },
+    "note": {
+      "name": "Kinetic Canvas (Note)",
+      "config": {
+        "mode": "cycle",
+        "display_layout": "full_canvas",
+        "refresh_seconds": 300
+      },
+      "template": [
+        "{{kinetic_canvas.note_line1}}",
+        "{{kinetic_canvas.note_line2}}",
+        "{{kinetic_canvas.note_line3}}"
+      ],
+      "line_metadata": [
+        { "alignment": "left", "wrap": false },
+        { "alignment": "left", "wrap": false },
+        { "alignment": "left", "wrap": false }
+      ]
     }
   }
 }

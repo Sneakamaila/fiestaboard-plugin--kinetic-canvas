@@ -78,6 +78,10 @@ class KineticCanvasPlugin(PluginBase):
         if mode not in valid_modes:
             errors.append(f"Invalid mode '{mode}'. Choose from: {', '.join(valid_modes)}")
 
+        layout = (config.get("display_layout") or "full_canvas").lower().strip()
+        if layout not in ("full_canvas", "canvas_with_info"):
+            errors.append(f"Invalid display_layout '{layout}'. Choose 'full_canvas' or 'canvas_with_info'.")
+
         if config.get("quiet_hours_enabled", True):
             start = config.get("quiet_hours_start", "22:00")
             end = config.get("quiet_hours_end", "07:00")
@@ -137,6 +141,7 @@ class KineticCanvasPlugin(PluginBase):
             self.state_manager.save(state)
 
             # 5. Build Template Variables
+            layout = cfg.get("display_layout", "full_canvas")
             data = build_plugin_variables(
                 flagship_matrix=result.flagship_matrix,
                 note_matrix=result.note_matrix,
@@ -146,6 +151,7 @@ class KineticCanvasPlugin(PluginBase):
                 active_mode=result.metadata.get("active_mode", mode),
                 is_quiet=False,
                 extra_metadata=result.metadata,
+                layout=layout,
             )
 
             return PluginResult(available=True, data=data)

@@ -72,3 +72,44 @@ def test_build_plugin_variables():
     assert data["note_line1"] == "{63}" * NOTE_WIDTH
     assert data["is_quiet_hours"] == "NO"
     assert data["meta_custom_val"] == 42
+
+def test_build_plugin_variables_canvas_with_info():
+    f_mat = [[COLOR_RED for _ in range(FLAGSHIP_WIDTH)] for _ in range(FLAGSHIP_HEIGHT)]
+    n_mat = [[COLOR_RED for _ in range(NOTE_WIDTH)] for _ in range(NOTE_HEIGHT)]
+
+    score = AcousticScore(
+        total_clicks=250,
+        moving_modules=30,
+        max_clicks=10,
+        estimated_duration_sec=0.35,
+        intensity="Rainfall",
+        sparkline=" ▂▄▆█ ",
+        center_col=10.0,
+        center_row=2.0,
+        description="Rainfall description",
+    )
+
+    data = build_plugin_variables(
+        flagship_matrix=f_mat,
+        note_matrix=n_mat,
+        score=score,
+        title="Zen Chime Wave",
+        description="Sound wave",
+        active_mode="zen_chime",
+        is_quiet=False,
+        extra_metadata={},
+        layout="canvas_with_info",
+    )
+
+    # In canvas_with_info:
+    # Lines 1-4 are art canvas
+    assert data["flagship_line1"] == "{63}" * FLAGSHIP_WIDTH
+    # Line 5 contains centered title
+    assert "ZEN CHIME WAVE" in data["flagship_line5"]
+    # Line 6 contains clicks info
+    assert "250 CLKS" in data["flagship_line6"]
+    # Line 3 on Note contains intensity and clicks
+    assert "RAINFALL 250C" in data["note_line3"]
+    # Raw canvas variables are always pure art
+    assert data["canvas_flagship_line5"] == "{63}" * FLAGSHIP_WIDTH
+    assert data["canvas_flagship_line6"] == "{63}" * FLAGSHIP_WIDTH

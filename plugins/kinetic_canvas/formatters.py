@@ -6,6 +6,8 @@ from typing import Any, Dict, List
 from .acoustics import AcousticScore
 from .constants import (
     COLOR_TAG_MAP,
+    FLAGSHIP_WIDTH,
+    NOTE_WIDTH,
     PHYSICAL_FLAP_SEQUENCE,
 )
 
@@ -45,6 +47,18 @@ def matrix_to_lines(matrix: List[List[int]]) -> List[str]:
     return lines
 
 
+def center_text(text: str, width: int) -> str:
+    """Center text neatly within board width."""
+    text = (text or "").strip()
+    if not text:
+        return " " * width if width > 0 else ""
+    if len(text) >= width:
+        return text[:width]
+    left = (width - len(text)) // 2
+    right = width - len(text) - left
+    return (" " * left) + text + (" " * right)
+
+
 def build_plugin_variables(
     flagship_matrix: List[List[int]],
     note_matrix: List[List[int]],
@@ -54,10 +68,33 @@ def build_plugin_variables(
     active_mode: str,
     is_quiet: bool,
     extra_metadata: Dict[str, Any],
+    layout: str = "full_canvas",
 ) -> Dict[str, Any]:
     """Assemble the complete dictionary of variables for FiestaBoard templates."""
-    flagship_lines = matrix_to_lines(flagship_matrix)
-    note_lines = matrix_to_lines(note_matrix)
+    raw_flagship_lines = matrix_to_lines(flagship_matrix)
+    raw_note_lines = matrix_to_lines(note_matrix)
+
+    # Determine layout lines based on layout preset
+    if layout == "canvas_with_info":
+        # Flagship (22x6): 4 rows art, row 5 title, row 6 acoustic sparkline + clicks
+        f_lines = [
+            raw_flagship_lines[0] if len(raw_flagship_lines) > 0 else "",
+            raw_flagship_lines[1] if len(raw_flagship_lines) > 1 else "",
+            raw_flagship_lines[2] if len(raw_flagship_lines) > 2 else "",
+            raw_flagship_lines[3] if len(raw_flagship_lines) > 3 else "",
+            center_text(title.upper(), FLAGSHIP_WIDTH),
+            center_text(f"[{score.sparkline[:8]}] {score.total_clicks} CLKS", FLAGSHIP_WIDTH),
+        ]
+        # Note (15x3): 2 rows art, row 3 acoustic status
+        n_lines = [
+            raw_note_lines[0] if len(raw_note_lines) > 0 else "",
+            raw_note_lines[1] if len(raw_note_lines) > 1 else "",
+            center_text(f"{score.intensity.upper()} {score.total_clicks}C", NOTE_WIDTH),
+        ]
+    else:
+        # full_canvas: 100% pure generative art
+        f_lines = raw_flagship_lines
+        n_lines = raw_note_lines
 
     vars_dict: Dict[str, Any] = {
         # Core titles and metadata
@@ -74,23 +111,35 @@ def build_plugin_variables(
         "acoustic_sparkline": score.sparkline,
         "acoustic_description": score.description,
 
-        # Flagship lines (22x6)
-        "flagship_line1": flagship_lines[0] if len(flagship_lines) > 0 else "",
-        "flagship_line2": flagship_lines[1] if len(flagship_lines) > 1 else "",
-        "flagship_line3": flagship_lines[2] if len(flagship_lines) > 2 else "",
-        "flagship_line4": flagship_lines[3] if len(flagship_lines) > 3 else "",
-        "flagship_line5": flagship_lines[4] if len(flagship_lines) > 4 else "",
-        "flagship_line6": flagship_lines[5] if len(flagship_lines) > 5 else "",
+        # Standard Flagship lines (22x6) — dynamically formatted according to display_layout preset
+        "flagship_line1": f_lines[0] if len(f_lines) > 0 else "",
+        "flagship_line2": f_lines[1] if len(f_lines) > 1 else "",
+        "flagship_line3": f_lines[2] if len(f_lines) > 2 else "",
+        "flagship_line4": f_lines[3] if len(f_lines) > 3 else "",
+        "flagship_line5": f_lines[4] if len(f_lines) > 4 else "",
+        "flagship_line6": f_lines[5] if len(f_lines) > 5 else "",
 
-        # Note lines (15x3)
-        "note_line1": note_lines[0] if len(note_lines) > 0 else "",
-        "note_line2": note_lines[1] if len(note_lines) > 1 else "",
-        "note_line3": note_lines[2] if len(note_lines) > 2 else "",
+        # Standard Note lines (15x3) — dynamically formatted according to display_layout preset
+        "note_line1": n_lines[0] if len(n_lines) > 0 else "",
+        "note_line2": n_lines[1] if len(n_lines) > 1 else "",
+        "note_line3": n_lines[2] if len(n_lines) > 2 else "",
+
+        # Raw full canvas lines (always 100% art, regardless of preset)
+        "canvas_flagship_line1": raw_flagship_lines[0] if len(raw_flagship_lines) > 0 else "",
+        "canvas_flagship_line2": raw_flagship_lines[1] if len(raw_flagship_lines) > 1 else "",
+        "canvas_flagship_line3": raw_flagship_lines[2] if len(raw_flagship_lines) > 2 else "",
+        "canvas_flagship_line4": raw_flagship_lines[3] if len(raw_flagship_lines) > 3 else "",
+        "canvas_flagship_line5": raw_flagship_lines[4] if len(raw_flagship_lines) > 4 else "",
+        "canvas_flagship_line6": raw_flagship_lines[5] if len(raw_flagship_lines) > 5 else "",
+
+        "canvas_note_line1": raw_note_lines[0] if len(raw_note_lines) > 0 else "",
+        "canvas_note_line2": raw_note_lines[1] if len(raw_note_lines) > 1 else "",
+        "canvas_note_line3": raw_note_lines[2] if len(raw_note_lines) > 2 else "",
 
         # Generic line aliases (matches Note by default)
-        "line1": note_lines[0] if len(note_lines) > 0 else "",
-        "line2": note_lines[1] if len(note_lines) > 1 else "",
-        "line3": note_lines[2] if len(note_lines) > 2 else "",
+        "line1": n_lines[0] if len(n_lines) > 0 else "",
+        "line2": n_lines[1] if len(n_lines) > 1 else "",
+        "line3": n_lines[2] if len(n_lines) > 2 else "",
     }
 
     # Add extra metadata fields (e.g. weather data, generation count)
