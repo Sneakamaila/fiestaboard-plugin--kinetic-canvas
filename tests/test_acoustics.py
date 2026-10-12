@@ -86,4 +86,4 @@ def test_make_sparkline():
     spark = make_sparkline(values)
     assert len(spark) == 5
     assert spark[0] == " "
-    assert spark[-1] == "█"
+    assert spark[-1] == "#"

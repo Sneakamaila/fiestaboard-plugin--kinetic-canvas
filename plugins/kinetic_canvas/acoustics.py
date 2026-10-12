@@ -63,7 +63,7 @@ def make_sparkline(values: List[int], min_val: int = 0, max_val: Optional[int] =
     if not values:
         return ""
 
-    bars = [" ", " ", "▂", "▃", "▄", "▅", "▆", "▇", "█"]
+    bars = [" ", ".", "-", "=", "#"]
     high = max_val if max_val is not None else max(values)
     low = min_val
 

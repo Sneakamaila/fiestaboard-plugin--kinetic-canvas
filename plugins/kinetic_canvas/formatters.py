@@ -83,7 +83,7 @@ def build_plugin_variables(
             raw_flagship_lines[2] if len(raw_flagship_lines) > 2 else "",
             raw_flagship_lines[3] if len(raw_flagship_lines) > 3 else "",
             center_text(title.upper(), FLAGSHIP_WIDTH),
-            center_text(f"[{score.sparkline[:8]}] {score.total_clicks} CLKS", FLAGSHIP_WIDTH),
+            center_text(f"({score.sparkline[:8]}) {score.total_clicks} CLKS", FLAGSHIP_WIDTH),
         ]
         # Note (15x3): 2 rows art, row 3 acoustic status
         n_lines = [
