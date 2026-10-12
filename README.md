@@ -65,6 +65,21 @@ $$\Delta = (\text{Target} - \text{Start}) \pmod{N_{\text{flaps}}}$$
 
 ---
 
+## ⚡ Wichtige Einstellungen fuer den echten Staccato Snap (Hardware-Unisono)
+
+Damit alle 132 Klappen beim Staccato Snap zeitgleich in einem einzigen mechanischen Peitschenschlag (~35 ms) schalten statt nacheinander als Welle abzulaufen:
+
+1. **In FiestaBoard (Page Editor):**
+   * Oeffne deine Kinetic Canvas Seite im FiestaBoard Page Editor.
+   * Waehle in der oberen Symbolleiste im Dropdown **Transition** die Option **`None`** (bzw. Keine Animation).
+   * *Hintergrund:* Standardmaessig steht FiestaBoard auf `Wave` oder `Use global default`, wodurch FiestaBoard die Klappen kuenstlich Spalte fuer Spalte verzoegert. `None` sendet die Matrix direkt ohne Software-Verzoegerung an das Board.
+
+2. **In der Vestaboard-Hardware (Vestaboard App / Cloud):**
+   * Stelle in den Vestaboard-App-Einstellungen unter *Transitions* den Modus auf **`Classic`** (Speed: `Fast`).
+   * *Hintergrund:* Im Werksmodus `Wave` oder `Gentle` verzoegert auch die Vestaboard-Firmware die Spalten intern. Im Modus `Classic` drehen sich laut offizieller Vestaboard-Dokumentation alle Klappen **vollstaendig simultan im selben Moment**.
+
+---
+
 ## 🖥️ Live Terminal Previewer & Acoustic Simulator
 
 You can preview the visual canvases in full ANSI 24-bit TrueColor and inspect acoustic telemetry directly in your terminal:

@@ -1,7 +1,7 @@
 {
   "id": "kinetic_canvas",
   "name": "Kinetic Canvas & Acoustic Art",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "Abstract generative art and kinetic split-flap acoustic soundscapes for Vestaboard Note and Flagship.",
   "author": "Sneakamaila",
   "icon": "palette",
@@ -14,7 +14,7 @@
       "mode": {
         "type": "string",
         "title": "Art & Sound Mode",
-        "description": "Select the generative art style and acoustic sound profile.",
+        "description": "Select generative art style and acoustic profile. (Tip for Staccato Snap: In FiestaBoard page editor set Transition to 'None' and Vestaboard app to 'Classic').",
         "default": "cycle",
         "enum": [
           "cycle",
@@ -58,7 +58,7 @@
       "chime_style": {
         "type": "string",
         "title": "Zen Chime Sound Profile",
-        "description": "Specific acoustic sound envelope when Zen Chime mode is active.",
+        "description": "Specific acoustic sound envelope when Zen Chime mode is active (set page Transition to 'None' for unison snaps).",
         "default": "cycle",
         "enum": [
           "cycle",

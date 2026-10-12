@@ -245,10 +245,10 @@ class ZenChimeGenerator(GeneratorBase):
             n_grid, _ = self._generate_staccato_snap(previous_note, NOTE_WIDTH, NOTE_HEIGHT, state)
             if f_step == 0:
                 title = "Zen Chime — Stakkato-Setup (Geometrie)"
-                desc = "Initialisiert das Bauhaus-Farbfeld fuer den synchronen Peitschenschlag-Zyklus."
+                desc = "Initialisiert das Bauhaus-Farbfeld. (Tipp: In FiestaBoard 'Transition' auf 'None' stellen fuer simultanen Snap)."
             else:
                 title = f"Zen Chime — Stakkato-Snap #{f_step} (Delta = 1)"
-                desc = "Synchroner mechanischer Peitschenschlag aller Klappen mit chromatischem Farbsprung."
+                desc = "Synchroner mechanischer Peitschenschlag aller Klappen mit chromatischem Farbsprung (Delta = 1)."
 
         elif chime_style == "acoustic_wave":
             f_grid = self._generate_acoustic_wave(FLAGSHIP_WIDTH, FLAGSHIP_HEIGHT, state)
