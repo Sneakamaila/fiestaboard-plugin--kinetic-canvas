@@ -113,3 +113,14 @@ CODE_TO_DRUM_INDEX: Dict[int, int] = {
 
 # Step duration per single flap click (approx 35 milliseconds in hardware)
 STEP_DURATION_SEC = 0.035
+
+
+def get_next_flap(code: int) -> int:
+    """Return the code of the flap immediately following `code` on the physical drum wheel (Δ = 1).
+
+    Guarantees that moving from `code` to the returned code requires strictly 1 mechanical click
+    on the physical Vestaboard stepper motor (approx 35ms duration in Classic mode).
+    """
+    idx = CODE_TO_DRUM_INDEX.get(code, 0)
+    next_idx = (idx + 1) % len(PHYSICAL_FLAP_SEQUENCE)
+    return PHYSICAL_FLAP_SEQUENCE[next_idx]

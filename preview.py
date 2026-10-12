@@ -81,6 +81,8 @@ def main():
         "demo_mode": True,
     }
 
+    plugin.state_manager.clear()
+
     print("=" * 60)
     print("🎨 FIESTABOARD KINETIC CANVAS & ACOUSTIC SIMULATOR 🔊")
     print(f"Mode: {args.mode.upper()} | Steps: {args.steps}")

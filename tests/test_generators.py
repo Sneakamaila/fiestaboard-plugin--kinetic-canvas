@@ -2,6 +2,7 @@
 
 import pytest
 from plugins.kinetic_canvas.constants import (
+    CODE_TO_DRUM_INDEX,
     COLOR_BLACK,
     COLOR_WHITE,
     FLAGSHIP_HEIGHT,
@@ -144,4 +145,68 @@ def test_registry_cycle_mode():
 
     # Cycle should rotate between different generators
     assert len(set(modes_seen)) >= 4
+
+
+def test_zen_chime_note_snap_all_consecutive_steps():
+    """Verify that on Vestaboard Note (15x3), every step in Suite 0 advances strictly with Delta = 1."""
+    from plugins.kinetic_canvas.acoustics import calculate_flap_distance, compute_acoustic_score
+
+    gen = ZenChimeGenerator()
+    state = {}
+
+    # Step 0: Setup / Movement Initializer
+    res = gen.generate(None, None, {"chime_style": "staccato_snap"}, state)
+    prev_note = res.note_matrix
+
+    # Steps 1 to 7: All 7 snaps must have Δ = 1 for all 45 modules
+    for step_num in range(1, 8):
+        res = gen.generate(res.flagship_matrix, prev_note, {"chime_style": "staccato_snap"}, state)
+        curr_note = res.note_matrix
+
+        score = compute_acoustic_score(prev_note, curr_note)
+        assert score.max_clicks == 1, f"Step {step_num} failed max_clicks == 1 (got {score.max_clicks})"
+        assert score.total_clicks == NOTE_WIDTH * NOTE_HEIGHT  # exactly 45 clicks
+        assert score.moving_modules == NOTE_WIDTH * NOTE_HEIGHT  # exactly 45 modules
+
+        for r in range(NOTE_HEIGHT):
+            for c in range(NOTE_WIDTH):
+                dist = calculate_flap_distance(prev_note[r][c], curr_note[r][c])
+                assert dist == 1, f"Cell ({r}, {c}) at step {step_num} had distance {dist}"
+
+        prev_note = curr_note
+
+
+def test_zen_chime_no_illegal_codes_ever():
+    """Verify that across 30 consecutive iterations of Staccato Snap, all codes are valid physical drum flaps."""
+    gen = ZenChimeGenerator()
+    state = {}
+    prev_f = None
+    prev_n = None
+
+    for i in range(30):
+        res = gen.generate(prev_f, prev_n, {"chime_style": "staccato_snap"}, state)
+        for row in res.flagship_matrix:
+            for code in row:
+                assert code in CODE_TO_DRUM_INDEX, f"Iteration {i}: Illegal code {code} in flagship"
+                assert code != 71, f"Iteration {i}: Code 71 found in flagship"
+        for row in res.note_matrix:
+            for code in row:
+                assert code in CODE_TO_DRUM_INDEX, f"Iteration {i}: Illegal code {code} in note"
+                assert code != 71, f"Iteration {i}: Code 71 found in note"
+        prev_f = res.flagship_matrix
+        prev_n = res.note_matrix
+
+
+def test_get_next_flap_cyclic_accuracy():
+    """Verify physical flap successor behavior at wrap boundaries and color sectors."""
+    from plugins.kinetic_canvas.constants import get_next_flap
+
+    # Colors
+    assert get_next_flap(63) == 64  # Red -> Orange
+    assert get_next_flap(69) == 70  # White -> Black
+    assert get_next_flap(70) == 0   # Black -> Blank (Wrap around to 0!)
+    assert get_next_flap(0) == 1    # Blank -> 'A'
+    assert get_next_flap(26) == 27  # 'Z' -> '1'
+    assert get_next_flap(36) == 37  # '0' -> '!'
+    assert get_next_flap(62) == 63  # Heart / Degree -> Red
 

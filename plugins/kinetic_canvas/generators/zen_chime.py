@@ -6,6 +6,7 @@ import random
 from typing import Any, Dict, List, Optional, Tuple
 
 from ..constants import (
+    CODE_TO_DRUM_INDEX,
     COLOR_BLACK,
     COLOR_BLUE,
     COLOR_GREEN,
@@ -18,6 +19,7 @@ from ..constants import (
     FLAGSHIP_WIDTH,
     NOTE_HEIGHT,
     NOTE_WIDTH,
+    get_next_flap,
 )
 from .base import GenerationResult, GeneratorBase
 
@@ -48,34 +50,89 @@ class ZenChimeGenerator(GeneratorBase):
     def display_name(self) -> str:
         return "Zen Chime & Sound Sculptures"
 
-    # ---------- 1. STACCATO SNAP: Bauhaus Geometric Color Frames (Δ = 1) ----------
+    # ---------- 1. STACCATO SNAP: Physical Drum Sequences & Abstract Art (Δ = 1) ----------
 
-    def _seed_snap_canvas(self, width: int, height: int, pattern_idx: int = 0) -> List[List[int]]:
-        """Generate a geometric abstract color composition using base colors [63, 64, 65, 66]."""
-        base_colors = [COLOR_RED, COLOR_ORANGE, COLOR_YELLOW, COLOR_GREEN]
-        grid = [[base_colors[0] for _ in range(width)] for _ in range(height)]
+    SNAP_SUITES = [
+        {
+            "id": "bauhaus_frames",
+            "name": "Bauhaus-Farbrahmen",
+            "max_steps": 7,
+            "desc": "Konzentrische Farbflächen migrieren synchron von Warm nach Kalt.",
+        },
+        {
+            "id": "chromatic_chevrons",
+            "name": "Diagonale Farb-Stufen",
+            "max_steps": 7,
+            "desc": "Diagonale Farbstreifen wandern im Unisono-Klick durch das Farbspektrum.",
+        },
+        {
+            "id": "heart_bloom",
+            "name": "Herz-Blüte & Glyphen",
+            "max_steps": 10,
+            "desc": "Optische Typografie und Herzen blühen aus dem Zentrum in leuchtende Farben auf.",
+        },
+        {
+            "id": "color_pillars",
+            "name": "Architektonische Klangsäulen",
+            "max_steps": 7,
+            "desc": "Vertikale Farbsäulen verschieben ihre Harmonien im mechanischen Gleichschritt.",
+        },
+        {
+            "id": "typographic_lattice",
+            "name": "Typografische Kinetik (+ & =)",
+            "max_steps": 14,
+            "desc": "Geometrisches Gitter aus ASCII-Satzzeichen transformiert sich in Herzen und Farbflächen.",
+        },
+    ]
+
+    def _seed_snap_suite(self, suite_idx: int, width: int, height: int) -> List[List[int]]:
+        """Seed an abstract composition using strictly valid physical drum codes."""
+        suite_id = suite_idx % len(self.SNAP_SUITES)
+        grid = [[COLOR_BLACK for _ in range(width)] for _ in range(height)]
         cx = (width - 1) / 2.0
         cy = (height - 1) / 2.0
 
-        p = pattern_idx % 4
-        for r in range(height):
-            for c in range(width):
-                if p == 0:
-                    # Concentric Bauhaus frames
+        if suite_id == 0:
+            # Suite 0: Concentric Bauhaus Frame (Red outer & Orange core)
+            for r in range(height):
+                for c in range(width):
                     dist = math.sqrt(((c - cx) / (width / 2.0)) ** 2 + ((r - cy) / (height / 2.0)) ** 2)
-                    idx = int(dist * 3.5) % len(base_colors)
-                elif p == 1:
-                    # Diagonal chromatic chevrons
-                    idx = (c + r) % len(base_colors)
-                elif p == 2:
-                    # Geometric quadrants / diamond
+                    grid[r][c] = COLOR_ORANGE if dist < 0.65 else COLOR_RED
+
+        elif suite_id == 1:
+            # Suite 1: Diagonal Chromatic Chevrons (Red & Orange)
+            for r in range(height):
+                for c in range(width):
+                    grid[r][c] = COLOR_RED if (c + r) % 2 == 0 else COLOR_ORANGE
+
+        elif suite_id == 2:
+            # Suite 2: Optical Glyphs & Heart Bloom (/, ?, Heart/62)
+            # 62 = Heart on Note, ° on Flagship; 60 = ?; 59 = /
+            for r in range(height):
+                for c in range(width):
                     dx = abs(c - cx) / (width / 2.0)
                     dy = abs(r - cy) / (height / 2.0)
-                    idx = int((dx + dy) * 2.2) % len(base_colors)
-                else:
-                    # Symmetrical horizontal bands
-                    idx = int(abs(r - cy) * 1.5) % len(base_colors)
-                grid[r][c] = base_colors[idx]
+                    m_dist = dx + dy
+                    if m_dist < 0.55:
+                        grid[r][c] = 62  # Heart on Note / ° on Flagship
+                    elif m_dist < 1.05:
+                        grid[r][c] = 60  # ?
+                    else:
+                        grid[r][c] = 59  # /
+
+        elif suite_id == 3:
+            # Suite 3: Architectural Color Columns
+            for r in range(height):
+                for c in range(width):
+                    grid[r][c] = COLOR_RED if (c // 2) % 2 == 0 else COLOR_ORANGE
+
+        else:
+            # Suite 4: Typographic Lattice (+ and =)
+            # 46 = '+', 48 = '='
+            for r in range(height):
+                for c in range(width):
+                    grid[r][c] = 46 if (c + r) % 2 == 0 else 48
+
         return grid
 
     def _generate_staccato_snap(
@@ -84,39 +141,47 @@ class ZenChimeGenerator(GeneratorBase):
         width: int,
         height: int,
         state: Dict[str, Any],
-    ) -> Tuple[List[List[int]], int]:
-        """Advance every color tile by exactly 1 step (Δ = 1).
+    ) -> Tuple[List[List[int]], int, str, str]:
+        """Advance every module strictly by 1 physical flap step on the drum wheel (Δ = 1).
 
-        Acoustics: All modules click simultaneously in ~35ms: UNISON SNAP!
-        Visual: Pure geometric color blocks shift to their adjacent harmonic hue.
-        Returns: (grid, step_number)
+        Acoustics: All modules click simultaneously in ~35ms: 100% UNISON SNAP!
+        Visual: Pure geometric compositions shift harmonically along the physical drum sequence.
+        Returns: (grid, step_number, suite_name, suite_desc)
         """
         step_key = f"snap_step_{width}x{height}"
-        pat_key = f"snap_pattern_{width}x{height}"
+        suite_key = f"snap_suite_{width}x{height}"
         current_step = state.get(step_key, 0)
+        current_suite_idx = state.get(suite_key, 0) % len(self.SNAP_SUITES)
+        suite = self.SNAP_SUITES[current_suite_idx]
+        max_steps = suite["max_steps"]
+        suite_name = suite["name"]
+        suite_desc = suite["desc"]
 
-        # A valid snap matrix has all cells within [63..69] (strictly before 70/Black)
-        is_valid_snap = (
+        is_valid_prev = (
             prev_matrix is not None
             and len(prev_matrix) == height
             and len(prev_matrix[0]) == width
-            and all(63 <= cell <= 69 for row in prev_matrix for cell in row)
-            and current_step < 4
+            and all(cell in CODE_TO_DRUM_INDEX for row in prev_matrix for cell in row)
         )
 
-        if not is_valid_snap:
-            # Seed a fresh geometric composition (Phase 0)
-            pat = state.get(pat_key, 0)
-            grid = self._seed_snap_canvas(width, height, pat)
-            state[pat_key] = pat + 1
+        if not is_valid_prev or current_step == 0:
+            # Phase 0: Setup / Movement Initializer
+            grid = self._seed_snap_suite(current_suite_idx, width, height)
+            state[step_key] = 1
+            return grid, 0, suite_name, suite_desc
+
+        # Active Snap Step: Advance every single module strictly by 1 physical flap (Δ = 1)
+        grid = [[get_next_flap(prev_matrix[r][c]) for c in range(width)] for r in range(height)]
+        snap_num = current_step
+
+        if current_step >= max_steps:
+            # Suite completed its movement! Next interval will initiate the next suite
             state[step_key] = 0
-            return grid, 0
+            state[suite_key] = current_suite_idx + 1
         else:
-            # Advance each cell by exactly 1 physical flap step in hardware
-            grid = [[prev_matrix[r][c] + 1 for c in range(width)] for r in range(height)]
-            next_step = current_step + 1
-            state[step_key] = next_step
-            return grid, next_step
+            state[step_key] = current_step + 1
+
+        return grid, snap_num, suite_name, suite_desc
 
     # ---------- 2. ACOUSTIC WAVE: Flowing Spectral Prism ----------
 
@@ -241,14 +306,17 @@ class ZenChimeGenerator(GeneratorBase):
         rng = random.Random()
 
         if chime_style == "staccato_snap":
-            f_grid, f_step = self._generate_staccato_snap(previous_flagship, FLAGSHIP_WIDTH, FLAGSHIP_HEIGHT, state)
-            n_grid, _ = self._generate_staccato_snap(previous_note, NOTE_WIDTH, NOTE_HEIGHT, state)
-            if f_step == 0:
-                title = "Zen Chime — Stakkato-Setup (Geometrie)"
-                desc = "Initialisiert das Bauhaus-Farbfeld. (Tipp: In FiestaBoard 'Transition' auf 'None' stellen fuer simultanen Snap)."
+            f_grid, f_step, f_name, f_desc = self._generate_staccato_snap(previous_flagship, FLAGSHIP_WIDTH, FLAGSHIP_HEIGHT, state)
+            n_grid, n_step, n_name, n_desc = self._generate_staccato_snap(previous_note, NOTE_WIDTH, NOTE_HEIGHT, state)
+            step = n_step if n_step > 0 else f_step
+            suite_name = n_name
+            suite_desc = n_desc
+            if step == 0:
+                title = f"Zen Chime — Stakkato-Setup ({suite_name})"
+                desc = f"Initialisiert die Komposition für synchrone Stakkato-Snaps (Delta = 1, 35ms). {suite_desc}"
             else:
-                title = f"Zen Chime — Stakkato-Snap #{f_step} (Delta = 1)"
-                desc = "Synchroner mechanischer Peitschenschlag aller Klappen mit chromatischem Farbsprung (Delta = 1)."
+                title = f"Zen Chime — Stakkato-Snap #{step} (Delta = 1)"
+                desc = f"Synchroner mechanischer Peitschenschlag aller Klappen ({suite_name}, 35ms, Delta = 1). {suite_desc}"
 
         elif chime_style == "acoustic_wave":
             f_grid = self._generate_acoustic_wave(FLAGSHIP_WIDTH, FLAGSHIP_HEIGHT, state)

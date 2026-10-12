@@ -1,10 +1,13 @@
-"""Unit tests for in-memory StateManager."""
+"""Unit tests for StateManager with persistent file backing."""
 
+from pathlib import Path
 from plugins.kinetic_canvas.state_manager import StateManager
 
 
-def test_state_manager_save_and_load():
-    mgr = StateManager()
+def test_state_manager_save_and_load(tmp_path: Path):
+    cache_file = tmp_path / "test_state.json"
+    mgr = StateManager(cache_file=cache_file)
+    mgr.clear()
 
     # Initial load is empty
     assert mgr.load() == {}
@@ -20,8 +23,11 @@ def test_state_manager_save_and_load():
     assert mgr.load()["generation_count"] == 5
 
 
-def test_state_manager_clear():
-    mgr = StateManager()
+def test_state_manager_clear(tmp_path: Path):
+    cache_file = tmp_path / "test_state_clear.json"
+    mgr = StateManager(cache_file=cache_file)
+    mgr.clear()
+
     mgr.save({"mode": "zen_chime"})
     assert mgr.load() == {"mode": "zen_chime"}
 
