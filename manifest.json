@@ -1,0 +1,254 @@
+{
+  "id": "kinetic_canvas",
+  "name": "Kinetic Canvas & Acoustic Art",
+  "version": "1.0.0",
+  "description": "Abstract generative art and kinetic split-flap acoustic soundscapes for Vestaboard Note and Flagship.",
+  "author": "Sneakamaila",
+  "icon": "palette",
+  "category": "art",
+  "repository": "https://github.com/Sneakamaila/fiestaboard-plugin--kinetic-canvas",
+  "settings_schema": {
+    "type": "object",
+    "properties": {
+      "mode": {
+        "type": "string",
+        "title": "Art & Sound Mode",
+        "description": "Select the generative art style and acoustic sound profile.",
+        "default": "cycle",
+        "enum": [
+          "cycle",
+          "mondrian",
+          "game_of_life",
+          "wolfram",
+          "weather",
+          "zen_chime"
+        ],
+        "enumNames": [
+          "Exhibition Cycle (All Styles)",
+          "Mondrian & De Stijl (Primary Color Fields)",
+          "Conway's Game of Life (Cellular Automata)",
+          "Wolfram 1D Automata (Rule 30/90/110)",
+          "Weather Resonance (Live Weather)",
+          "Zen Chime & Sound Sculptures (Acoustic Envelopes)"
+        ]
+      },
+      "chime_style": {
+        "type": "string",
+        "title": "Zen Chime Sound Profile",
+        "description": "Specific acoustic sound envelope when Zen Chime mode is active.",
+        "default": "cycle",
+        "enum": [
+          "cycle",
+          "staccato_snap",
+          "acoustic_wave",
+          "rainfall",
+          "harmonic_decay"
+        ],
+        "enumNames": [
+          "Auto-Cycle All Envelopes",
+          "Staccato Snap (Crisp unison crack, Δ=1)",
+          "Acoustic Wave (Stereo pan sweep)",
+          "Mechanical Rainfall (Gentle stochastic patter)",
+          "Harmonic Decay (Singing bowl resonance)"
+        ]
+      },
+      "wolfram_rule": {
+        "type": "integer",
+        "title": "Wolfram Rule Number",
+        "description": "Cellular rule for Wolfram tapestries (30 = chaotic, 90 = Sierpinski, 110 = complex).",
+        "default": 30,
+        "enum": [30, 90, 110, 184],
+        "enumNames": [
+          "Rule 30 (Chaotic Turbulence)",
+          "Rule 90 (Sierpinski Fractal)",
+          "Rule 110 (Complex Turing-Complete)",
+          "Rule 184 (Traffic Flow)"
+        ]
+      },
+      "city_name": {
+        "type": "string",
+        "title": "Weather Location (City Name)",
+        "description": "Display name of your location for weather resonance.",
+        "default": "Berlin"
+      },
+      "latitude": {
+        "type": "number",
+        "title": "Weather Latitude",
+        "description": "Latitude coordinate for Open-Meteo weather API (e.g. 52.52)",
+        "default": 52.52
+      },
+      "longitude": {
+        "type": "number",
+        "title": "Weather Longitude",
+        "description": "Longitude coordinate for Open-Meteo weather API (e.g. 13.405)",
+        "default": 13.405
+      },
+      "demo_mode": {
+        "type": "boolean",
+        "title": "Weather Demo Mode",
+        "description": "Simulate atmospheric weather data without internet requests.",
+        "default": false
+      },
+      "quiet_hours_enabled": {
+        "type": "boolean",
+        "title": "Enable Quiet Hours (Nachtruhe)",
+        "description": "Silence or dampen acoustic flap movements during nighttime hours.",
+        "default": true
+      },
+      "quiet_hours_start": {
+        "type": "string",
+        "title": "Quiet Hours Start (HH:MM)",
+        "description": "Start time for night silence (24h format, e.g. 22:00).",
+        "default": "22:00"
+      },
+      "quiet_hours_end": {
+        "type": "string",
+        "title": "Quiet Hours End (HH:MM)",
+        "description": "End time for night silence (24h format, e.g. 07:00).",
+        "default": "07:00"
+      },
+      "quiet_mode_behavior": {
+        "type": "string",
+        "title": "Quiet Mode Behavior",
+        "description": "Action when quiet hours are active.",
+        "default": "silent_hold",
+        "enum": ["silent_hold", "blank"],
+        "enumNames": [
+          "Silent Hold (Freeze current artwork, 0 clicks)",
+          "Blank (Turn to blank black canvas)"
+        ]
+      },
+      "refresh_seconds": {
+        "type": "integer",
+        "title": "Refresh Interval (seconds)",
+        "description": "Interval between kinetic transitions (minimum 30 seconds to preserve hardware).",
+        "default": 300,
+        "minimum": 30,
+        "maximum": 3600
+      }
+    }
+  },
+  "variables": {
+    "groups": {
+      "art": {
+        "label": "Artwork & Style Details"
+      },
+      "acoustics": {
+        "label": "Acoustic Score & Telemetry"
+      },
+      "flagship": {
+        "label": "Vestaboard Flagship Layout (22x6)"
+      },
+      "note": {
+        "label": "Vestaboard Note Layout (15x3)"
+      }
+    },
+    "simple": {
+      "title": {
+        "description": "Poetic title of the current artwork composition",
+        "type": "string",
+        "group": "art",
+        "example": "Composition #402 in Rot, Gelb und Blau"
+      },
+      "mode": {
+        "description": "Currently active art engine mode",
+        "type": "string",
+        "group": "art",
+        "example": "mondrian"
+      },
+      "description": {
+        "description": "Detailed description of the visual piece or current simulation state",
+        "type": "string",
+        "group": "art",
+        "example": "Mondrian-Komposition mit primären Farbfeldern"
+      },
+      "is_quiet_hours": {
+        "description": "Whether quiet hours are currently suppressing sound (YES or NO)",
+        "type": "string",
+        "group": "art",
+        "example": "NO"
+      },
+      "sound_profile": {
+        "description": "Acoustic intensity category (Silent, Whisper, Rainfall, Crescendo, Thunder)",
+        "type": "string",
+        "group": "acoustics",
+        "example": "Rainfall"
+      },
+      "total_clicks": {
+        "description": "Total mechanical flap clicks generated in this transition",
+        "type": "integer",
+        "group": "acoustics",
+        "example": 412
+      },
+      "moving_modules": {
+        "description": "Count of physical modules that rotated during this transition",
+        "type": "integer",
+        "group": "acoustics",
+        "example": 38
+      },
+      "duration_sec": {
+        "description": "Estimated acoustic duration of the mechanical transition",
+        "type": "string",
+        "group": "acoustics",
+        "example": "1.4s"
+      },
+      "acoustic_sparkline": {
+        "description": "ASCII sparkline of acoustic activity across board columns",
+        "type": "string",
+        "group": "acoustics",
+        "example": " ▂▄▆█▆▄▂ "
+      },
+      "acoustic_description": {
+        "description": "Human-readable acoustic score summary",
+        "type": "string",
+        "group": "acoustics",
+        "example": "Sanftes Regen-Prasseln (412 Klicks, 38 Module, ~1.4s)"
+      },
+      "flagship_line1": {
+        "description": "Line 1 formatted for Vestaboard Flagship (22 tiles)",
+        "type": "string",
+        "group": "flagship"
+      },
+      "flagship_line2": {
+        "description": "Line 2 formatted for Vestaboard Flagship (22 tiles)",
+        "type": "string",
+        "group": "flagship"
+      },
+      "flagship_line3": {
+        "description": "Line 3 formatted for Vestaboard Flagship (22 tiles)",
+        "type": "string",
+        "group": "flagship"
+      },
+      "flagship_line4": {
+        "description": "Line 4 formatted for Vestaboard Flagship (22 tiles)",
+        "type": "string",
+        "group": "flagship"
+      },
+      "flagship_line5": {
+        "description": "Line 5 formatted for Vestaboard Flagship (22 tiles)",
+        "type": "string",
+        "group": "flagship"
+      },
+      "flagship_line6": {
+        "description": "Line 6 formatted for Vestaboard Flagship (22 tiles)",
+        "type": "string",
+        "group": "flagship"
+      },
+      "note_line1": {
+        "description": "Line 1 formatted for Vestaboard Note (15 tiles)",
+        "type": "string",
+        "group": "note"
+      },
+      "note_line2": {
+        "description": "Line 2 formatted for Vestaboard Note (15 tiles)",
+        "type": "string",
+        "group": "note"
+      },
+      "note_line3": {
+        "description": "Line 3 formatted for Vestaboard Note (15 tiles)",
+        "type": "string",
+        "group": "note"
+      }
+    }
+  }
+}
