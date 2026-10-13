@@ -25,6 +25,7 @@ COLOR_BLACK = 70
 
 # FiestaBoard template tags
 TAG_BLANK = "{0}"
+TAG_HEART = "{62}"
 TAG_RED = "{63}"
 TAG_ORANGE = "{64}"
 TAG_YELLOW = "{65}"
@@ -36,6 +37,7 @@ TAG_BLACK = "{70}"
 
 COLOR_TAG_MAP: Dict[int, str] = {
     COLOR_BLANK: " ",
+    62: TAG_HEART,
     COLOR_RED: TAG_RED,
     COLOR_ORANGE: TAG_ORANGE,
     COLOR_YELLOW: TAG_YELLOW,

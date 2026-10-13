@@ -131,13 +131,14 @@ class GameOfLifeGenerator(GeneratorBase):
             needs_reseed = True
         else:
             current_live = sum(sum(1 for c in row if c > 0) for row in flagship_grid)
+            note_live = sum(sum(1 for c in row if c > 0) for row in note_grid)
             current_hash = self._grid_hash(flagship_grid)
-            if current_live == 0 or history.count(current_hash) >= 2 or gen > 60:
+            if current_live == 0 or note_live == 0 or history.count(current_hash) >= 2 or gen > 60:
                 needs_reseed = True
 
         if needs_reseed:
-            flagship_grid = self._seed_random(FLAGSHIP_HEIGHT, FLAGSHIP_WIDTH, rng)
-            note_grid = self._seed_random(NOTE_HEIGHT, NOTE_WIDTH, rng)
+            flagship_grid = self._seed_random(FLAGSHIP_HEIGHT, FLAGSHIP_WIDTH, rng, density=0.28)
+            note_grid = self._seed_random(NOTE_HEIGHT, NOTE_WIDTH, rng, density=0.36)
             gen = 1
             history = [self._grid_hash(flagship_grid)]
             births = sum(sum(1 for c in row if c > 0) for row in flagship_grid)
@@ -146,6 +147,12 @@ class GameOfLifeGenerator(GeneratorBase):
         else:
             flagship_grid, births, deaths = self._step(flagship_grid, FLAGSHIP_HEIGHT, FLAGSHIP_WIDTH)
             note_grid, _, _ = self._step(note_grid, NOTE_HEIGHT, NOTE_WIDTH)
+
+            # Prevent Note from stagnating in extinction while Flagship is still alive
+            note_live = sum(sum(1 for c in row if c > 0) for row in note_grid)
+            if note_live < 3:
+                note_grid = self._seed_random(NOTE_HEIGHT, NOTE_WIDTH, rng, density=0.36)
+
             gen += 1
             history.append(self._grid_hash(flagship_grid))
             if len(history) > 10:

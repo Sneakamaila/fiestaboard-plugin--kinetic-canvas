@@ -210,3 +210,46 @@ def test_get_next_flap_cyclic_accuracy():
     assert get_next_flap(36) == 37  # '0' -> '!'
     assert get_next_flap(62) == 63  # Heart / Degree -> Red
 
+
+def test_mondrian_note_layout_no_horizontal_lines():
+    """Verify that on Note (15x3), Mondrian generates clean vertical color blocks without horizontal lines."""
+    gen = MondrianGenerator()
+    import random
+    rng = random.Random(42)
+    grid = gen._generate_board(NOTE_WIDTH, NOTE_HEIGHT, rng)
+
+    # No row should be completely black
+    for r in range(NOTE_HEIGHT):
+        row = grid[r]
+        assert not all(c == COLOR_BLACK for c in row), f"Row {r} on Note was completely black"
+
+    # Must contain at least one primary color (Red, Blue, or Yellow)
+    all_codes = {c for row in grid for c in row}
+    from plugins.kinetic_canvas.constants import COLOR_RED, COLOR_BLUE, COLOR_YELLOW
+    assert any(c in all_codes for c in (COLOR_RED, COLOR_BLUE, COLOR_YELLOW))
+
+
+def test_game_of_life_note_never_stays_extinct():
+    """Verify that Game of Life maintains living cells on Note across 25 generations."""
+    gen = GameOfLifeGenerator()
+    state = {}
+    prev_f = None
+    prev_n = None
+
+    for _ in range(25):
+        res = gen.generate(prev_f, prev_n, {}, state)
+        note_live = sum(sum(1 for c in row if c != COLOR_BLACK) for row in res.note_matrix)
+        assert note_live >= 3, "Game of Life Note went extinct / below minimum threshold"
+        prev_f = res.flagship_matrix
+        prev_n = res.note_matrix
+
+
+def test_wolfram_rule_184_traffic_particles():
+    """Verify Rule 184 starts with distributed traffic particles instead of a solitary dot."""
+    gen = WolframAutomataGenerator()
+    state = {}
+    res = gen.generate(None, None, {"wolfram_rule": 184}, state)
+    note_live = sum(sum(1 for c in row if c != COLOR_BLACK) for row in res.note_matrix)
+    # 3 rows of 15 cells: with density ~0.4, should have well over 5 live particles
+    assert note_live >= 6, f"Rule 184 had too few particles on Note: {note_live}"
+

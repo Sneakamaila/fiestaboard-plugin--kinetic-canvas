@@ -1,7 +1,7 @@
 {
   "id": "kinetic_canvas",
   "name": "Kinetic Canvas & Acoustic Art",
-  "version": "1.0.4",
+  "version": "1.0.5",
   "description": "Abstract generative art and kinetic split-flap acoustic soundscapes for Vestaboard Note and Flagship.",
   "author": "Sneakamaila",
   "icon": "palette",
@@ -13,8 +13,8 @@
     "properties": {
       "mode": {
         "type": "string",
-        "title": "Art & Sound Mode",
-        "description": "Select generative art style and acoustic profile. (Tip for Staccato Snap: In FiestaBoard page editor set Transition to 'None' and Vestaboard app to 'Classic').",
+        "title": "1. Hauptmodus: Kunststil & Akustik",
+        "description": "Wähle das aktive visuelle & akustische Kunstprogramm. (Tipp für Staccato Snap: Im FiestaBoard Page Editor die Transition auf '[Keine]' stellen und in der Vestaboard-App 'Klassisch' wählen).",
         "default": "cycle",
         "enum": [
           "cycle",
@@ -29,36 +29,44 @@
           "zen_chime"
         ],
         "enumNames": [
-          "Ausstellungs-Zyklus (Wechselt alle Stile)",
-          "Staccato Snap (Synchroner Farbsprung, Δ=1)",
-          "Klangwelle (Spektraler Stereo-Sweep)",
-          "Nachtregen (Sanftes Klick-Prasseln)",
-          "Resonanz-Mandala (Klangschale)",
-          "Mondrian & De Stijl (Farbflaechen)",
-          "Conway's Game of Life (Lebende Zellen)",
-          "Wolfram 1D Automaten (Muster-Teppiche)",
-          "Wetter-Resonanz (Live-Wetter Kunst)",
-          "Zen Chime (Alle Klangskulpturen im Wechsel)"
+          "🎪 Ausstellungs-Zyklus (Wechselt fortlaufend alle Stile)",
+          "⚡ Staccato Snap (Synchroner 35ms-Peitschenschlag, Δ=1)",
+          "🌊 Klangwelle (Spektraler Stereo-Sweep)",
+          "🌧️ Nachtregen (Sanftes stochastisches Klick-Prasseln)",
+          "🧘 Resonanz-Mandala (Klangschalen-Zentrierung)",
+          "🎨 Mondrian & De Stijl (Geometrische Primärfarbfelder)",
+          "🧬 Conway's Game of Life (Lebende Zell-Kolonie)",
+          "📐 Wolfram 1D-Automaten (Mathematische Teppiche)",
+          "⛅ Wetter-Resonanz (Live-Wetter in Kunst übersetzt)",
+          "🔔 Zen Chime Suite (Rotiert durch alle 4 Klangskulpturen)"
         ]
       },
       "display_layout": {
         "type": "string",
-        "title": "Board Layout Preset",
-        "description": "Choose whether the board shows pure full-screen art or includes title & sound telemetry.",
+        "title": "2. Anzeige-Layout: Vollbild vs. Info-Zeile",
+        "description": "Bestimmt die Aufteilung auf dem Display. 'Reine Vollbild-Kunst' nutzt 100% aller Zeilen für Kunst. 'Kunst mit Status-Badge' reserviert Zeilen für Titel & Klicks.",
         "default": "full_canvas",
         "enum": [
           "full_canvas",
           "canvas_with_info"
         ],
         "enumNames": [
-          "Pure Full-Screen Canvas (100% Abstract Art)",
-          "Art Canvas with Sound Badge (Art + Title & Acoustic Waveform)"
+          "🖼️ Reine Vollbild-Kunst (Empfohlen — Note: 3 Zeilen Kunst / Flagship: 6 Zeilen Kunst)",
+          "📊 Kunst mit Status-Badge (Note: 2 Zeilen Kunst + 1 Zeile Info / Flagship: 4 Zeilen Kunst + 2 Zeilen Info)"
         ]
+      },
+      "refresh_seconds": {
+        "type": "integer",
+        "title": "3. Wechsel-Intervall (Sekunden)",
+        "description": "Zeitabstand zwischen kinetischen Übergängen. Minimum 30 Sekunden zum Schutz der Hardware (Standard: 30s oder 60s).",
+        "default": 30,
+        "minimum": 30,
+        "maximum": 3600
       },
       "chime_style": {
         "type": "string",
-        "title": "Zen Chime Sound Profile",
-        "description": "Specific acoustic sound envelope when Zen Chime mode is active (set page Transition to 'None' for unison snaps).",
+        "title": "[Zen Chime] Sound-Profil (Nur aktiv bei Modus 'Zen Chime')",
+        "description": "Greift NUR, wenn oben als Hauptmodus 'Zen Chime Suite' gewählt ist. Bei direkter Wahl von 'Staccato Snap', 'Klangwelle' etc. wird dies ignoriert.",
         "default": "cycle",
         "enum": [
           "cycle",
@@ -68,57 +76,55 @@
           "harmonic_decay"
         ],
         "enumNames": [
-          "Auto-Cycle All Envelopes",
-          "Staccato Snap (Crisp unison crack, Δ=1)",
-          "Acoustic Wave (Stereo pan sweep)",
-          "Mechanical Rainfall (Gentle stochastic patter)",
-          "Harmonic Decay (Singing bowl resonance)"
+          "🔄 Auto-Rotation (Wechselt zwischen allen 4 Klangskulpturen)",
+          "⚡ Staccato Snap (35ms Unisono-Peitschenschlag, Δ=1)",
+          "🌊 Klangwelle (Spektraler Stereo-Sweep)",
+          "🌧️ Mechanischer Tropfenregen (Pianissimo-Klicks)",
+          "🧘 Resonanz-Mandala (Klangschalen-Zentrierung)"
         ]
       },
       "wolfram_rule": {
         "type": "integer",
-        "title": "Wolfram Rule Number",
-        "description": "Cellular rule for Wolfram tapestries (30 = chaotic, 90 = Sierpinski, 110 = complex).",
+        "title": "[Wolfram-Automat] Regel-Nummer (Nur aktiv bei Modus 'Wolfram')",
+        "description": "Greift NUR bei Modus 'Wolfram 1D-Automaten'. Bestimmt das mathematische Regelwerk nach Stephen Wolfram.",
         "default": 30,
         "enum": [30, 90, 110, 184],
         "enumNames": [
-          "Rule 30 (Chaotic Turbulence)",
-          "Rule 90 (Sierpinski Fractal)",
-          "Rule 110 (Complex Turing-Complete)",
-          "Rule 184 (Traffic Flow)"
+          "Regel 30: Chaotische Turbulenz (Rot / Orange)",
+          "Regel 90: Sierpinski-Dreiecke / Fraktal (Blau / Weiß)",
+          "Regel 110: Turing-vollständige Komplexität (Grün / Gelb)",
+          "Regel 184: Autobahn-Verkehrsfluss & Stau-Dynamik (Gelb / Blau)"
         ]
       },
       "city_name": {
         "type": "string",
-        "title": "Weather Location (City Name)",
-        "description": "Display name of your location for weather resonance.",
+        "title": "[Wetter-Resonanz] Stadtname (Nur aktiv bei Modus 'Wetter')",
+        "description": "Greift NUR bei Modus 'Wetter-Resonanz'. Anzeigename deines Standorts im Titel.",
         "default": "Berlin"
       },
       "latitude": {
         "type": "number",
-        "title": "Weather Latitude",
-        "description": "Latitude coordinate for Open-Meteo weather API (e.g. 52.52)",
+        "title": "[Wetter-Resonanz] Breitengrad / Latitude (Nur aktiv bei Modus 'Wetter')",
+        "description": "Greift NUR bei Modus 'Wetter-Resonanz'. Geografische Breite für Open-Meteo (z.B. 52.52 für Berlin, 48.14 für München, 50.11 für Frankfurt, 47.37 für Zürich, 48.21 für Wien).",
         "default": 52.52
       },
       "longitude": {
         "type": "number",
-        "title": "Weather Longitude",
-        "description": "Longitude coordinate for Open-Meteo weather API (e.g. 13.405)",
+        "title": "[Wetter-Resonanz] Längengrad / Longitude (Nur aktiv bei Modus 'Wetter')",
+        "description": "Greift NUR bei Modus 'Wetter-Resonanz'. Geografische Länge für Open-Meteo (z.B. 13.405 für Berlin, 11.58 für München, 8.68 für Frankfurt, 8.54 für Zürich, 16.37 für Wien).",
         "default": 13.405
       },
       "demo_mode": {
         "type": "boolean",
-        "title": "Weather Demo Mode",
-        "description": "Simulate atmospheric weather data without internet requests.",
+        "title": "[Wetter-Resonanz] Offline / Demo-Wetter",
+        "description": "Greift NUR bei Modus 'Wetter-Resonanz'. Simuliert atmosphärisches Wetter ohne HTTP-Abfragen an Open-Meteo.",
         "default": false
       },
-      "refresh_seconds": {
+      "seed": {
         "type": "integer",
-        "title": "Refresh Interval (seconds)",
-        "description": "Interval between kinetic transitions (minimum 30 seconds to preserve hardware).",
-        "default": 300,
-        "minimum": 30,
-        "maximum": 3600
+        "title": "[Allgemein] Fester Zufallswert / Seed (Optional)",
+        "description": "0 = Dynamisch (jedes Mal ein neues Kunstwerk). Eine feste Zahl (z.B. 42) friert die geometrische Komposition dauerhaft ein.",
+        "default": 0
       }
     }
   },

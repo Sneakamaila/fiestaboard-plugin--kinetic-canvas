@@ -75,16 +75,22 @@ class WolframAutomataGenerator(GeneratorBase):
 
         # Re-seed if rule changed or initial run
         if current_rule != rule_num or not flagship_rows or not note_rows:
-            # Seed with a single center impulse
-            f_seed = [0] * FLAGSHIP_WIDTH
-            f_seed[FLAGSHIP_WIDTH // 2] = 1
+            rng = random.Random()
+            if rule_num == 184:
+                # Rule 184 simulates highway traffic: needs distributed particles to form density shockwaves
+                f_seed = [1 if rng.random() < 0.4 else 0 for _ in range(FLAGSHIP_WIDTH)]
+                n_seed = [1 if rng.random() < 0.4 else 0 for _ in range(NOTE_WIDTH)]
+            else:
+                # Rules 30, 90, 110: Single center impulse generates iconic expanding pyramids/fractals
+                f_seed = [0] * FLAGSHIP_WIDTH
+                f_seed[FLAGSHIP_WIDTH // 2] = 1
+                n_seed = [0] * NOTE_WIDTH
+                n_seed[NOTE_WIDTH // 2] = 1
 
             flagship_rows = [f_seed]
             for _ in range(FLAGSHIP_HEIGHT - 1):
                 flagship_rows.append(self._apply_rule(flagship_rows[-1], rule_num))
 
-            n_seed = [0] * NOTE_WIDTH
-            n_seed[NOTE_WIDTH // 2] = 1
             note_rows = [n_seed]
             for _ in range(NOTE_HEIGHT - 1):
                 note_rows.append(self._apply_rule(note_rows[-1], rule_num))
@@ -93,9 +99,13 @@ class WolframAutomataGenerator(GeneratorBase):
         else:
             # Advance: calculate new bottom row and scroll
             next_f = self._apply_rule(flagship_rows[-1], rule_num)
+            if sum(next_f) == 0:
+                next_f[FLAGSHIP_WIDTH // 2] = 1
             flagship_rows = flagship_rows[1:] + [next_f]
 
             next_n = self._apply_rule(note_rows[-1], rule_num)
+            if sum(next_n) == 0:
+                next_n[NOTE_WIDTH // 2] = 1
             note_rows = note_rows[1:] + [next_n]
 
             step_count += 1

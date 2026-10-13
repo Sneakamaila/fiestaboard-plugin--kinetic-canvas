@@ -41,9 +41,10 @@ class MondrianGenerator(GeneratorBase):
             v_lines = sorted(rng.sample(range(4, width - 4), k=rng.choice([1, 2])))
             h_lines = sorted(rng.sample(range(2, height - 2), k=rng.choice([1, 2])))
         else:
-            # Note (15x3): 1 vertical line, 0-1 horizontal line
-            v_lines = [rng.randint(4, width - 5)]
-            h_lines = [rng.randint(1, height - 1)] if height > 2 and rng.random() > 0.4 else []
+            # Note (15x3): 1-2 vertical dividing lines, no horizontal line to avoid consuming 33% of board
+            k = rng.choice([1, 2])
+            v_lines = sorted(rng.sample(range(3, width - 3), k=k))
+            h_lines = []
 
         # Find rectangular bounding boxes
         xs = [0] + v_lines + [width]
@@ -54,17 +55,23 @@ class MondrianGenerator(GeneratorBase):
             for j in range(len(xs) - 1):
                 boxes.append((ys[i], ys[i + 1], xs[j], xs[j + 1]))
 
-        # Primary palette: mostly white, 1 red, 1 blue, 1 yellow, occasional black block
-        palette_pool = [COLOR_RED, COLOR_BLUE, COLOR_YELLOW, COLOR_BLACK]
-        rng.shuffle(palette_pool)
+        # Authentic De Stijl palette: white canvas accented by pure red, blue, and yellow
+        primaries = [COLOR_RED, COLOR_BLUE, COLOR_YELLOW]
+        rng.shuffle(primaries)
 
-        # Assign colors to regions
+        # Distribute colors: at least one primary color and white fields
         box_colors: Dict[int, int] = {}
-        for idx, _ in enumerate(boxes):
-            if idx < len(palette_pool):
-                box_colors[idx] = palette_pool[idx]
+        for idx in range(len(boxes)):
+            if idx < len(primaries):
+                box_colors[idx] = primaries[idx]
             else:
                 box_colors[idx] = COLOR_WHITE
+
+        # Shuffle color assignments across the boxes
+        assigned = list(box_colors.values())
+        rng.shuffle(assigned)
+        for idx in range(len(boxes)):
+            box_colors[idx] = assigned[idx]
 
         # Fill regions
         for idx, (y1, y2, x1, x2) in enumerate(boxes):
