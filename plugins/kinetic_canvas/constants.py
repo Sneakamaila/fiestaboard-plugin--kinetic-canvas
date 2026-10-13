@@ -21,7 +21,7 @@ COLOR_GREEN = 66
 COLOR_BLUE = 67
 COLOR_VIOLET = 68
 COLOR_WHITE = 69
-COLOR_BLACK = 70
+COLOR_BLACK = 70  # Vestaboard color code for Black chip (maps to drum index 0 on hardware)
 
 # FiestaBoard template tags
 TAG_BLANK = "{0}"
@@ -61,20 +61,22 @@ COLOR_NAMES: Dict[int, str] = {
     70: "black",
 }
 
-# Physical drum flap sequence in clockwise single-direction order
-# Character codes:
-# 0: Blank
-# 1-26: A-Z
-# 27-36: 1-9, 0
-# 37-62: Punctuation marks
-# 63-70: Color chips
+# Physical drum flap sequence in clockwise single-direction order (Exactly 64 flaps)
+# Mechanical layout per Bit module:
+# Flap 0: Blank (0)
+# Flaps 1..26: Letters A-Z (1..26)
+# Flaps 27..36: Numbers 1-9, 0 (27..36)
+# Flaps 37..56: 20 Punctuation marks (37..42, 44, 46..50, 52..56, 59, 60, 62)
+# Flaps 57..63: 7 Color chips (63..69: Red, Orange, Yellow, Green, Blue, Violet, White)
+# Total: 1 + 26 + 10 + 20 + 7 = 64 physical flaps.
+# White (69) advances directly to Blank (0) in 1 mechanical step (Delta = 1)!
 PHYSICAL_FLAP_SEQUENCE: List[int] = [
-    0,   # Blank
-    # Letters A-Z (1..26)
+    0,   # Blank / Black (Flap 0)
+    # Letters A-Z (Flaps 1..26)
     1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26,
-    # Digits 1..9, 0 (27..36)
+    # Digits 1..9, 0 (Flaps 27..36)
     27, 28, 29, 30, 31, 32, 33, 34, 35, 36,
-    # Punctuation (37..62)
+    # Punctuation & Icons (Flaps 37..56)
     37,  # !
     38,  # @
     39,  # #
@@ -94,24 +96,25 @@ PHYSICAL_FLAP_SEQUENCE: List[int] = [
     56,  # .
     59,  # /
     60,  # ?
-    62,  # ° (or heart)
-    # Colors (63..70)
+    62,  # ° (Flagship) / ❤️ (Note)
+    # Color Chips (Flaps 57..63)
     63,  # Poppy Red
     64,  # Orange
     65,  # Yellow
     66,  # Green
-    67,  # Blue
+    67,  # Paris Blue
     68,  # Violet
     69,  # White
-    70,  # Black
 ]
 
-FLAP_COUNT = len(PHYSICAL_FLAP_SEQUENCE)
+FLAP_COUNT = len(PHYSICAL_FLAP_SEQUENCE)  # Exactly 64
 
-# Lookup: code -> drum index (0 .. FLAP_COUNT - 1)
+# Lookup: code -> drum index (0 .. 63)
 CODE_TO_DRUM_INDEX: Dict[int, int] = {
     code: idx for idx, code in enumerate(PHYSICAL_FLAP_SEQUENCE)
 }
+# Alias code 70 to flap 0 (Blank / Black)
+CODE_TO_DRUM_INDEX[70] = 0
 
 # Step duration per single flap click (approx 35 milliseconds in hardware)
 STEP_DURATION_SEC = 0.035
@@ -122,6 +125,7 @@ def get_next_flap(code: int) -> int:
 
     Guarantees that moving from `code` to the returned code requires strictly 1 mechanical click
     on the physical Vestaboard stepper motor (approx 35ms duration in Classic mode).
+    White (69) -> Blank (0) -> 'A' (1).
     """
     idx = CODE_TO_DRUM_INDEX.get(code, 0)
     next_idx = (idx + 1) % len(PHYSICAL_FLAP_SEQUENCE)

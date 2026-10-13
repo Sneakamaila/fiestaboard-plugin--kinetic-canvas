@@ -56,6 +56,7 @@ def main():
             "game_of_life",
             "wolfram",
             "weather",
+            "snap_calibration",
             "zen_chime",
         ],
         default="cycle",

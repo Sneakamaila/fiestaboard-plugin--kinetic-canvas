@@ -1,7 +1,7 @@
 {
   "id": "kinetic_canvas",
   "name": "Kinetic Canvas & Acoustic Art",
-  "version": "1.0.5",
+  "version": "1.0.6",
   "description": "Abstract generative art and kinetic split-flap acoustic soundscapes for Vestaboard Note and Flagship.",
   "author": "Sneakamaila",
   "icon": "palette",
@@ -13,7 +13,7 @@
     "properties": {
       "mode": {
         "type": "string",
-        "title": "1. Hauptmodus: Kunststil & Akustik",
+        "title": "1. Hauptprogramm: Kunststil & Akustik",
         "description": "Wähle das aktive visuelle & akustische Kunstprogramm. (Tipp für Staccato Snap: Im FiestaBoard Page Editor die Transition auf '[Keine]' stellen und in der Vestaboard-App 'Klassisch' wählen).",
         "default": "cycle",
         "enum": [
@@ -26,7 +26,7 @@
           "game_of_life",
           "wolfram",
           "weather",
-          "zen_chime"
+          "snap_calibration"
         ],
         "enumNames": [
           "🎪 Ausstellungs-Zyklus (Wechselt fortlaufend alle Stile)",
@@ -38,7 +38,7 @@
           "🧬 Conway's Game of Life (Lebende Zell-Kolonie)",
           "📐 Wolfram 1D-Automaten (Mathematische Teppiche)",
           "⛅ Wetter-Resonanz (Live-Wetter in Kunst übersetzt)",
-          "🔔 Zen Chime Suite (Rotiert durch alle 4 Klangskulpturen)"
+          "🔬 Hardware-Diagnose (Schrittweiser Δ=1 Flap-Inspector)"
         ]
       },
       "display_layout": {
@@ -63,29 +63,29 @@
         "minimum": 30,
         "maximum": 3600
       },
-      "chime_style": {
+      "snap_pattern": {
         "type": "string",
-        "title": "[Zen Chime] Sound-Profil (Nur aktiv bei Modus 'Zen Chime')",
-        "description": "Greift NUR, wenn oben als Hauptmodus 'Zen Chime Suite' gewählt ist. Bei direkter Wahl von 'Staccato Snap', 'Klangwelle' etc. wird dies ignoriert.",
-        "default": "cycle",
+        "title": "[NUR BEI STACCATO SNAP] Bewegungs-Muster",
+        "description": "Greift NUR bei Modus 'Staccato Snap'. Bestimmt die geometrische Komposition und das Fortschreiten auf der Klappen-Walze.",
+        "default": "continuum",
         "enum": [
-          "cycle",
-          "staccato_snap",
-          "acoustic_wave",
-          "rainfall",
-          "harmonic_decay"
+          "continuum",
+          "bauhaus_frames",
+          "chromatic_chevrons",
+          "heart_bloom",
+          "color_pillars"
         ],
         "enumNames": [
-          "🔄 Auto-Rotation (Wechselt zwischen allen 4 Klangskulpturen)",
-          "⚡ Staccato Snap (35ms Unisono-Peitschenschlag, Δ=1)",
-          "🌊 Klangwelle (Spektraler Stereo-Sweep)",
-          "🌧️ Mechanischer Tropfenregen (Pianissimo-Klicks)",
-          "🧘 Resonanz-Mandala (Klangschalen-Zentrierung)"
+          "♾️ Ewiges Kontinuum (Empfohlen — 100% Endlos-Snap ohne Reset)",
+          "🔲 Konzentrische Bauhaus-Farbrahmen",
+          "📐 Diagonale Farb-Stufen",
+          "❤️ Herz-Blüte & Spektrum",
+          "🏛️ Architektonische Farb-Säulen"
         ]
       },
       "wolfram_rule": {
         "type": "integer",
-        "title": "[Wolfram-Automat] Regel-Nummer (Nur aktiv bei Modus 'Wolfram')",
+        "title": "[NUR BEI WOLFRAM] Regel-Nummer",
         "description": "Greift NUR bei Modus 'Wolfram 1D-Automaten'. Bestimmt das mathematische Regelwerk nach Stephen Wolfram.",
         "default": 30,
         "enum": [30, 90, 110, 184],
@@ -98,31 +98,31 @@
       },
       "city_name": {
         "type": "string",
-        "title": "[Wetter-Resonanz] Stadtname (Nur aktiv bei Modus 'Wetter')",
+        "title": "[NUR BEI WETTER] Standort / Stadtname",
         "description": "Greift NUR bei Modus 'Wetter-Resonanz'. Anzeigename deines Standorts im Titel.",
         "default": "Berlin"
       },
       "latitude": {
         "type": "number",
-        "title": "[Wetter-Resonanz] Breitengrad / Latitude (Nur aktiv bei Modus 'Wetter')",
+        "title": "[NUR BEI WETTER] Breitengrad / Latitude",
         "description": "Greift NUR bei Modus 'Wetter-Resonanz'. Geografische Breite für Open-Meteo (z.B. 52.52 für Berlin, 48.14 für München, 50.11 für Frankfurt, 47.37 für Zürich, 48.21 für Wien).",
         "default": 52.52
       },
       "longitude": {
         "type": "number",
-        "title": "[Wetter-Resonanz] Längengrad / Longitude (Nur aktiv bei Modus 'Wetter')",
+        "title": "[NUR BEI WETTER] Längengrad / Longitude",
         "description": "Greift NUR bei Modus 'Wetter-Resonanz'. Geografische Länge für Open-Meteo (z.B. 13.405 für Berlin, 11.58 für München, 8.68 für Frankfurt, 8.54 für Zürich, 16.37 für Wien).",
         "default": 13.405
       },
       "demo_mode": {
         "type": "boolean",
-        "title": "[Wetter-Resonanz] Offline / Demo-Wetter",
+        "title": "[NUR BEI WETTER] Offline / Demo-Wetter",
         "description": "Greift NUR bei Modus 'Wetter-Resonanz'. Simuliert atmosphärisches Wetter ohne HTTP-Abfragen an Open-Meteo.",
         "default": false
       },
       "seed": {
         "type": "integer",
-        "title": "[Allgemein] Fester Zufallswert / Seed (Optional)",
+        "title": "[ERWEITERT] Fester Zufallswert / Seed (Optional)",
         "description": "0 = Dynamisch (jedes Mal ein neues Kunstwerk). Eine feste Zahl (z.B. 42) friert die geometrische Komposition dauerhaft ein.",
         "default": 0
       }

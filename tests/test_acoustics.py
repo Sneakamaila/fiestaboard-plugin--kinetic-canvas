@@ -39,8 +39,10 @@ def test_calculate_flap_distance_wrap_around():
     """Moving backward in the drum index wraps around cyclically."""
     # B (2) to A (1) wraps full circle minus 1
     assert calculate_flap_distance(2, 1) == FLAP_COUNT - 1
-    # Black (70) to Blank (0) is 1 step forward on the drum
-    assert calculate_flap_distance(COLOR_BLACK, 0) == 1
+    # White (69) to Blank (0) is 1 step forward on the drum
+    assert calculate_flap_distance(COLOR_WHITE, 0) == 1
+    # Blank (0) to 'A' (1) is 1 step forward on the drum
+    assert calculate_flap_distance(0, 1) == 1
 
 
 def test_compute_acoustic_score_silent():
@@ -56,11 +58,11 @@ def test_compute_acoustic_score_silent():
 
 def test_compute_acoustic_score_whisper():
     """Small shifts produce Whisper intensity."""
-    prev = [[COLOR_BLACK for _ in range(FLAGSHIP_WIDTH)] for _ in range(FLAGSHIP_HEIGHT)]
-    curr = [[COLOR_BLACK for _ in range(FLAGSHIP_WIDTH)] for _ in range(FLAGSHIP_HEIGHT)]
-    # Change only 2 modules by 1 step
-    curr[0][0] = 0  # Black -> Blank is 1 step
-    curr[0][1] = 0
+    prev = [[1 for _ in range(FLAGSHIP_WIDTH)] for _ in range(FLAGSHIP_HEIGHT)]
+    curr = [[1 for _ in range(FLAGSHIP_WIDTH)] for _ in range(FLAGSHIP_HEIGHT)]
+    # Change only 2 modules by 1 step (A to B)
+    curr[0][0] = 2  # A (1) -> B (2) is 1 step
+    curr[0][1] = 2
 
     score = compute_acoustic_score(prev, curr)
     assert score.total_clicks == 2

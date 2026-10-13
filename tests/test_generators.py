@@ -176,25 +176,57 @@ def test_zen_chime_note_snap_all_consecutive_steps():
         prev_note = curr_note
 
 
-def test_zen_chime_no_illegal_codes_ever():
-    """Verify that across 30 consecutive iterations of Staccato Snap, all codes are valid physical drum flaps."""
+def test_zen_continuum_infinite_snap_64_steps():
+    """Verify that in Continuum mode, Staccato Snap performs 64 uninterrupted Delta=1 clicks without reset."""
+    from plugins.kinetic_canvas.acoustics import calculate_flap_distance, compute_acoustic_score
+
     gen = ZenChimeGenerator()
     state = {}
-    prev_f = None
-    prev_n = None
 
-    for i in range(30):
-        res = gen.generate(prev_f, prev_n, {"chime_style": "staccato_snap"}, state)
-        for row in res.flagship_matrix:
-            for code in row:
-                assert code in CODE_TO_DRUM_INDEX, f"Iteration {i}: Illegal code {code} in flagship"
-                assert code != 71, f"Iteration {i}: Code 71 found in flagship"
-        for row in res.note_matrix:
-            for code in row:
-                assert code in CODE_TO_DRUM_INDEX, f"Iteration {i}: Illegal code {code} in note"
-                assert code != 71, f"Iteration {i}: Code 71 found in note"
-        prev_f = res.flagship_matrix
-        prev_n = res.note_matrix
+    # Initializer
+    res = gen.generate(None, None, {"chime_style": "staccato_snap", "snap_pattern": "continuum"}, state)
+    prev_note = res.note_matrix
+    prev_flagship = res.flagship_matrix
+
+    # Test full 64-step circle: EVERY transition must be Δ = 1
+    for step_num in range(1, 65):
+        res = gen.generate(prev_flagship, prev_note, {"chime_style": "staccato_snap", "snap_pattern": "continuum"}, state)
+        curr_note = res.note_matrix
+        curr_flagship = res.flagship_matrix
+
+        score = compute_acoustic_score(prev_note, curr_note)
+        assert score.max_clicks == 1, f"Step {step_num} failed max_clicks == 1 (got {score.max_clicks})"
+        assert score.moving_modules == NOTE_WIDTH * NOTE_HEIGHT
+        assert score.total_clicks == NOTE_WIDTH * NOTE_HEIGHT
+
+        for r in range(NOTE_HEIGHT):
+            for c in range(NOTE_WIDTH):
+                dist = calculate_flap_distance(prev_note[r][c], curr_note[r][c])
+                assert dist == 1, f"Cell ({r}, {c}) at step {step_num} had distance {dist}"
+
+        prev_note = curr_note
+        prev_flagship = curr_flagship
+
+
+def test_zen_snap_calibration_mode():
+    """Verify that snap_calibration mode cycles through all isolated diagnostic steps with clear labels."""
+    from plugins.kinetic_canvas.acoustics import calculate_flap_distance
+    from plugins.kinetic_canvas.generators.zen_chime import CALIBRATION_STEPS
+
+    gen = ZenChimeGenerator()
+    state = {}
+
+    # Step 0: Setup
+    res0 = gen.generate(None, None, {"chime_style": "snap_calibration"}, state)
+    assert "[Flap-Test Setup]" in res0.title
+    prev_note = res0.note_matrix
+
+    # Step 1: Rot (63) -> Orange (64)
+    res1 = gen.generate(res0.flagship_matrix, prev_note, {"chime_style": "snap_calibration"}, state)
+    assert "[Flap-Test #1/" in res1.title
+    assert "Rot (63) -> Orange (64)" in res1.title
+    assert res1.note_matrix[0][0] == 64
+    assert calculate_flap_distance(prev_note[0][0], res1.note_matrix[0][0]) == 1
 
 
 def test_get_next_flap_cyclic_accuracy():
@@ -203,9 +235,9 @@ def test_get_next_flap_cyclic_accuracy():
 
     # Colors
     assert get_next_flap(63) == 64  # Red -> Orange
-    assert get_next_flap(69) == 70  # White -> Black
-    assert get_next_flap(70) == 0   # Black -> Blank (Wrap around to 0!)
+    assert get_next_flap(69) == 0   # White -> Blank (Physical wrap around to flap 0!)
     assert get_next_flap(0) == 1    # Blank -> 'A'
+    assert get_next_flap(70) == 1   # Code 70 alias maps to Blank -> 'A'
     assert get_next_flap(26) == 27  # 'Z' -> '1'
     assert get_next_flap(36) == 37  # '0' -> '!'
     assert get_next_flap(62) == 63  # Heart / Degree -> Red

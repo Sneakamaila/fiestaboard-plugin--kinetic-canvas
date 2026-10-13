@@ -14,6 +14,8 @@ ZEN_CHIME_SINGLETON = ZenChimeGenerator()
 
 ZEN_MODE_ALIASES: Dict[str, str] = {
     "zen_snap": "staccato_snap",
+    "staccato_snap": "staccato_snap",
+    "snap_calibration": "snap_calibration",
     "zen_wave": "acoustic_wave",
     "zen_rain": "rainfall",
     "zen_gong": "harmonic_decay",
@@ -26,6 +28,8 @@ AVAILABLE_GENERATORS: Dict[str, GeneratorBase] = {
     "weather": WeatherResonanceGenerator(),
     "zen_chime": ZEN_CHIME_SINGLETON,
     "zen_snap": ZEN_CHIME_SINGLETON,
+    "staccato_snap": ZEN_CHIME_SINGLETON,
+    "snap_calibration": ZEN_CHIME_SINGLETON,
     "zen_wave": ZEN_CHIME_SINGLETON,
     "zen_rain": ZEN_CHIME_SINGLETON,
     "zen_gong": ZEN_CHIME_SINGLETON,
