@@ -37,7 +37,6 @@ TAG_BLACK = "{70}"
 
 COLOR_TAG_MAP: Dict[int, str] = {
     COLOR_BLANK: " ",
-    62: TAG_HEART,
     COLOR_RED: TAG_RED,
     COLOR_ORANGE: TAG_ORANGE,
     COLOR_YELLOW: TAG_YELLOW,

@@ -95,10 +95,10 @@ class ZenChimeGenerator(GeneratorBase):
             "desc": "Diagonale Farbstreifen wandern im Unisono-Klick durch das Farbspektrum.",
         },
         {
-            "id": "heart_bloom",
-            "name": "Herz-Blüte & Spektrum",
+            "id": "color_bloom",
+            "name": "Farb-Blüte & Spektrum",
             "max_steps": 8,
-            "desc": "Herz-Ikonen blühen kontinuierlich in warmes und kühles Farbspektrum auf.",
+            "desc": "Warme Farbfelder blühen kontinuierlich im mechanischen Spektrum auf.",
         },
         {
             "id": "color_pillars",
@@ -151,19 +151,19 @@ class ZenChimeGenerator(GeneratorBase):
                 for c in range(width):
                     grid[r][c] = COLOR_YELLOW if (c + r) % 2 == 0 else COLOR_ORANGE
 
-        elif suite_id == "heart_bloom":
-            # Suite 2: Heart Blossom & Warm Spectrum (64=Orange, 63=Red, 62=Heart)
+        elif suite_id == "color_bloom":
+            # Suite 2: Color Blossom & Warm Spectrum (Yellow, Orange, Red)
             for r in range(height):
                 for c in range(width):
                     dx = abs(c - cx) / (width / 2.0)
                     dy = abs(r - cy) / (height / 2.0)
                     m_dist = dx + dy
                     if m_dist < 0.55:
-                        grid[r][c] = COLOR_ORANGE
+                        grid[r][c] = COLOR_YELLOW
                     elif m_dist < 1.05:
-                        grid[r][c] = COLOR_RED
+                        grid[r][c] = COLOR_ORANGE
                     else:
-                        grid[r][c] = 62  # Heart on Note / ° on Flagship
+                        grid[r][c] = COLOR_RED
 
         else:
             # Suite: Architectural Color Columns (Yellow & Orange)

@@ -1,7 +1,7 @@
 {
   "id": "kinetic_canvas",
   "name": "Kinetic Canvas & Acoustic Art",
-  "version": "1.0.7",
+  "version": "1.0.8",
   "description": "Abstract generative art and kinetic split-flap acoustic soundscapes for Vestaboard Note and Flagship.",
   "author": "Sneakamaila",
   "icon": "palette",
@@ -14,7 +14,7 @@
       "mode": {
         "type": "string",
         "title": "1. Hauptprogramm: Kunststil & Akustik",
-        "description": "Wähle das aktive visuelle & akustische Kunstprogramm. (Tipp für Staccato Snap: Im FiestaBoard Page Editor die Transition auf '[Keine]' stellen und in der Vestaboard-App 'Klassisch' wählen).",
+        "description": "Wähle das aktive visuelle & akustische Kunstprogramm für dein Vestaboard.",
         "default": "cycle",
         "enum": [
           "cycle",
@@ -25,20 +25,18 @@
           "mondrian",
           "game_of_life",
           "wolfram",
-          "weather",
-          "snap_calibration"
+          "weather"
         ],
         "enumNames": [
           "🎪 Ausstellungs-Zyklus (Wechselt fortlaufend alle Stile)",
-          "⚡ Staccato Snap (Synchroner 35ms-Peitschenschlag, Δ=1)",
+          "⚡ Bauhaus Farb-Choreografie (Simultaner Farbwechsel)",
           "🌊 Klangwelle (Spektraler Stereo-Sweep)",
           "🌧️ Nachtregen (Sanftes stochastisches Klick-Prasseln)",
           "🧘 Resonanz-Mandala (Klangschalen-Zentrierung)",
           "🎨 Mondrian & De Stijl (Geometrische Primärfarbfelder)",
           "🧬 Conway's Game of Life (Lebende Zell-Kolonie)",
           "📐 Wolfram 1D-Automaten (Mathematische Teppiche)",
-          "⛅ Wetter-Resonanz (Live-Wetter in Kunst übersetzt)",
-          "🔬 Hardware-Diagnose (Schrittweiser Δ=1 Flap-Inspector)"
+          "⛅ Wetter-Resonanz (Live-Wetter in Kunst übersetzt)"
         ]
       },
       "display_layout": {
@@ -65,21 +63,21 @@
       },
       "snap_pattern": {
         "type": "string",
-        "title": "[NUR BEI STACCATO SNAP] Bewegungs-Muster",
-        "description": "Greift NUR bei Modus 'Staccato Snap'. Bestimmt die geometrische Komposition und das Fortschreiten auf der Klappen-Walze.",
+        "title": "[NUR BEI BAUHAUS FARB-CHOREOGRAFIE] Bewegungs-Muster",
+        "description": "Greift NUR bei Modus 'Bauhaus Farb-Choreografie'. Bestimmt die geometrische Farbkomposition.",
         "default": "continuum",
         "enum": [
           "continuum",
           "bauhaus_frames",
           "chromatic_chevrons",
-          "heart_bloom",
+          "color_bloom",
           "color_pillars"
         ],
         "enumNames": [
-          "♾️ Ewiges Kontinuum (Empfohlen — 100% Endlos-Snap ohne Reset)",
+          "♾️ Ewiges Kontinuum (Empfohlen — Fortlaufender Farbzyklus)",
           "🔲 Konzentrische Bauhaus-Farbrahmen",
           "📐 Diagonale Farb-Stufen",
-          "❤️ Herz-Blüte & Spektrum",
+          "🌸 Farb-Blüte & Spektrum",
           "🏛️ Architektonische Farb-Säulen"
         ]
       },
