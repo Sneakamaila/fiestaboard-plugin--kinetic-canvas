@@ -61,50 +61,59 @@ COLOR_NAMES: Dict[int, str] = {
     70: "black",
 }
 
-# Physical drum flap sequence in clockwise single-direction order (Exactly 64 flaps)
-# Mechanical layout per Bit module:
-# Flap 0: Blank (0)
-# Flaps 1..26: Letters A-Z (1..26)
-# Flaps 27..36: Numbers 1-9, 0 (27..36)
-# Flaps 37..56: 20 Punctuation marks (37..42, 44, 46..50, 52..56, 59, 60, 62)
-# Flaps 57..63: 7 Color chips (63..69: Red, Orange, Yellow, Green, Blue, Violet, White)
-# Total: 1 + 26 + 10 + 20 + 7 = 64 physical flaps.
-# White (69) advances directly to Blank (0) in 1 mechanical step (Delta = 1)!
+# Physical drum flap sequence in true stepper motor forward rotation direction (Exactly 64 flaps).
+# Hardware Discovery: The physical stepper motors turn such that flaps cascade in descending character-code order:
+# 69 (White) -> 68 (Violet) -> 67 (Blue) -> 66 (Green) -> 65 (Yellow) -> 64 (Orange) -> 63 (Red) -> 62 (Heart) -> ... -> 1 (A) -> 0 (Blank) -> 69 (White).
+# Therefore:
+# - Gelb (65) -> Orange (64) is strictly 1 flap step (Delta = 1)!
+# - Orange (64) -> Rot (63) is strictly 1 flap step (Delta = 1)!
+# - 3 (29) -> 2 (28) -> 1 (27) is strictly 1 flap step (Delta = 1)!
+# - A (1) -> Blank (0) -> White (69) is strictly 1 flap step (Delta = 1)!
 PHYSICAL_FLAP_SEQUENCE: List[int] = [
-    0,   # Blank / Black (Flap 0)
-    # Letters A-Z (Flaps 1..26)
-    1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26,
-    # Digits 1..9, 0 (Flaps 27..36)
-    27, 28, 29, 30, 31, 32, 33, 34, 35, 36,
-    # Punctuation & Icons (Flaps 37..56)
-    37,  # !
-    38,  # @
-    39,  # #
-    40,  # $
-    41,  # (
-    42,  # )
-    44,  # -
-    46,  # +
-    47,  # &
-    48,  # =
-    49,  # ;
-    50,  # :
-    52,  # '
-    53,  # "
-    54,  # %
-    55,  # ,
-    56,  # .
-    59,  # /
-    60,  # ?
-    62,  # ° (Flagship) / ❤️ (Note)
-    # Color Chips (Flaps 57..63)
-    63,  # Poppy Red
-    64,  # Orange
-    65,  # Yellow
-    66,  # Green
-    67,  # Paris Blue
-    68,  # Violet
+    # Color Chips (Flaps 0..6: White down to Red)
     69,  # White
+    68,  # Violet
+    67,  # Paris Blue
+    66,  # Green
+    65,  # Yellow (lies before Orange in physical rotation!)
+    64,  # Orange (lies before Red in physical rotation!)
+    63,  # Poppy Red
+    # Punctuation & Icons (Flaps 7..26)
+    62,  # ° (Flagship) / ❤️ (Note)
+    60,  # ?
+    59,  # /
+    56,  # .
+    55,  # ,
+    54,  # %
+    53,  # "
+    52,  # '
+    50,  # :
+    49,  # ;
+    48,  # =
+    47,  # &
+    46,  # +
+    44,  # -
+    42,  # )
+    41,  # (
+    40,  # $
+    39,  # #
+    38,  # @
+    37,  # !
+    # Digits 0, 9..1 (Flaps 27..36)
+    36,  # 0
+    35,  # 9
+    34,  # 8
+    33,  # 7
+    32,  # 6
+    31,  # 5
+    30,  # 4
+    29,  # 3 (lies before 2 in physical rotation!)
+    28,  # 2 (lies before 1 in physical rotation!)
+    27,  # 1
+    # Letters Z down to A (Flaps 37..62)
+    26, 25, 24, 23, 22, 21, 20, 19, 18, 17, 16, 15, 14, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1,
+    # Blank / Black (Flap 63)
+    0,   # Blank / Black (Flap 63, loops directly to Flap 0: White 69)
 ]
 
 FLAP_COUNT = len(PHYSICAL_FLAP_SEQUENCE)  # Exactly 64
@@ -113,20 +122,20 @@ FLAP_COUNT = len(PHYSICAL_FLAP_SEQUENCE)  # Exactly 64
 CODE_TO_DRUM_INDEX: Dict[int, int] = {
     code: idx for idx, code in enumerate(PHYSICAL_FLAP_SEQUENCE)
 }
-# Alias code 70 to flap 0 (Blank / Black)
-CODE_TO_DRUM_INDEX[70] = 0
+# Alias code 70 to flap 0 (Blank / Black, index 63)
+CODE_TO_DRUM_INDEX[70] = CODE_TO_DRUM_INDEX[0]
 
 # Step duration per single flap click (approx 35 milliseconds in hardware)
 STEP_DURATION_SEC = 0.035
 
 
 def get_next_flap(code: int) -> int:
-    """Return the code of the flap immediately following `code` on the physical drum wheel (Δ = 1).
+    """Return the code of the flap immediately following `code` in the physical drum rotation (Δ = 1).
 
     Guarantees that moving from `code` to the returned code requires strictly 1 mechanical click
     on the physical Vestaboard stepper motor (approx 35ms duration in Classic mode).
-    White (69) -> Blank (0) -> 'A' (1).
+    Gelb (65) -> Orange (64) -> Rot (63) -> Herz (62) ... -> 'A' (1) -> Blank (0) -> Weiß (69).
     """
-    idx = CODE_TO_DRUM_INDEX.get(code, 0)
+    idx = CODE_TO_DRUM_INDEX.get(code, CODE_TO_DRUM_INDEX[0])
     next_idx = (idx + 1) % len(PHYSICAL_FLAP_SEQUENCE)
     return PHYSICAL_FLAP_SEQUENCE[next_idx]

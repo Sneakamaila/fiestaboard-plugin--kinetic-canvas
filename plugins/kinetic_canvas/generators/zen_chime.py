@@ -24,38 +24,41 @@ from ..constants import (
 )
 from .base import GenerationResult, GeneratorBase
 
-# Color sequence on the physical drum (contiguous range: 63 to 69 + 0)
-# Step distance from code to code+1 within 63..69 is strictly Δ = 1 (35ms hardware click)
-# Flap 69 (White) advances directly to Flap 0 (Blank) in 1 mechanical step (Delta = 1)!
+# Color sequence in physical drum rotation direction:
+# Flap 0 (Blank) -> Flap 69 (White) -> 68 (Violet) -> 67 (Blue) -> 66 (Green) -> 65 (Yellow) -> 64 (Orange) -> 63 (Red) -> 62 (Heart)...
+# Every transition from item[i] to item[i+1] is strictly Δ = 1 (35ms hardware click)!
 COLOR_SNAP_CYCLE = [
-    COLOR_RED,     # 63
-    COLOR_ORANGE,  # 64
-    COLOR_YELLOW,  # 65
-    COLOR_GREEN,   # 66
-    COLOR_BLUE,    # 67
-    COLOR_VIOLET,  # 68
+    COLOR_BLANK,   # 0 (Flap 63: natural black background, loops directly to Flap 0: White 69)
     COLOR_WHITE,   # 69
-    COLOR_BLANK,   # 0 (Flap 0: natural black background)
+    COLOR_VIOLET,  # 68
+    COLOR_BLUE,    # 67
+    COLOR_GREEN,   # 66
+    COLOR_YELLOW,  # 65 (Lies immediately before Orange in physical rotation!)
+    COLOR_ORANGE,  # 64 (Lies immediately before Red in physical rotation!)
+    COLOR_RED,     # 63
 ]
 
 CHIME_MODES = ["staccato_snap", "acoustic_wave", "rainfall", "harmonic_decay", "snap_calibration"]
 
 CALIBRATION_STEPS: List[Tuple[int, int, str, str]] = [
-    # (from_code, to_code, name_from, name_to)
-    (63, 64, "Rot (63)", "Orange (64)"),
-    (64, 65, "Orange (64)", "Gelb (65)"),
-    (65, 66, "Gelb (65)", "Grün (66)"),
-    (66, 67, "Grün (66)", "Blau (67)"),
-    (67, 68, "Blau (67)", "Violett (68)"),
-    (68, 69, "Violett (68)", "Weiß (69)"),
-    (69, 0,  "Weiß (69)", "Schwarz / Blank (0)"),
-    (0, 1,   "Schwarz / Blank (0)", "A (1)"),
-    (1, 2,   "A (1)", "B (2)"),
-    (2, 3,   "B (2)", "C (3)"),
-    (26, 27, "Z (26)", "1 (27)"),
-    (36, 37, "0 (36)", "! (37)"),
-    (60, 62, "? (60)", "Herz/Grad (62)"),
-    (62, 63, "Herz/Grad (62)", "Rot (63)"),
+    # (from_code, to_code, name_from, name_to) - All strictly Delta = 1 in hardware!
+    (65, 64, "Gelb (65)", "Orange (64)"),
+    (64, 63, "Orange (64)", "Rot (63)"),
+    (63, 62, "Rot (63)", "Herz / Grad (62)"),
+    (62, 60, "Herz / Grad (62)", "? (60)"),
+    (37, 36, "! (37)", "0 (36)"),
+    (30, 29, "4 (30)", "3 (29)"),
+    (29, 28, "3 (29)", "2 (28)"),
+    (28, 27, "2 (28)", "1 (27)"),
+    (27, 26, "1 (27)", "Z (26)"),
+    (3, 2,   "C (3)", "B (2)"),
+    (2, 1,   "B (2)", "A (1)"),
+    (1, 0,   "A (1)", "Blank / Schwarz (0)"),
+    (0, 69,  "Blank / Schwarz (0)", "Weiß (69)"),
+    (69, 68, "Weiß (69)", "Violett (68)"),
+    (68, 67, "Violett (68)", "Blau (67)"),
+    (67, 66, "Blau (67)", "Grün (66)"),
+    (66, 65, "Grün (66)", "Gelb (65)"),
 ]
 
 
@@ -118,8 +121,17 @@ class ZenChimeGenerator(GeneratorBase):
             suite_id = self.SNAP_SUITES[suite_id_or_idx % len(self.SNAP_SUITES)]["id"]
 
         if suite_id == "continuum":
-            # Endless concentric bands radiating through pure color palette
-            palette = [COLOR_RED, COLOR_ORANGE, COLOR_YELLOW, COLOR_GREEN, COLOR_BLUE, COLOR_VIOLET, COLOR_WHITE, COLOR_BLANK]
+            # Endless concentric bands radiating through pure color palette in physical rotation order
+            palette = [
+                COLOR_BLANK,
+                COLOR_WHITE,
+                COLOR_VIOLET,
+                COLOR_BLUE,
+                COLOR_GREEN,
+                COLOR_YELLOW,
+                COLOR_ORANGE,
+                COLOR_RED,
+            ]
             for r in range(height):
                 for c in range(width):
                     dist = math.sqrt(((c - cx) / (width / 2.0)) ** 2 + ((r - cy) / (height / 2.0)) ** 2)
@@ -127,37 +139,37 @@ class ZenChimeGenerator(GeneratorBase):
                     grid[r][c] = palette[p_idx]
 
         elif suite_id == "bauhaus_frames":
-            # Suite 0: Concentric Bauhaus Frame (Red outer & Orange core)
+            # Suite 0: Concentric Bauhaus Frame (Orange outer & Yellow core)
             for r in range(height):
                 for c in range(width):
                     dist = math.sqrt(((c - cx) / (width / 2.0)) ** 2 + ((r - cy) / (height / 2.0)) ** 2)
-                    grid[r][c] = COLOR_ORANGE if dist < 0.65 else COLOR_RED
+                    grid[r][c] = COLOR_YELLOW if dist < 0.65 else COLOR_ORANGE
 
         elif suite_id == "chromatic_chevrons":
-            # Suite 1: Diagonal Chromatic Chevrons (Red & Orange)
+            # Suite 1: Diagonal Chromatic Chevrons (Yellow & Orange)
             for r in range(height):
                 for c in range(width):
-                    grid[r][c] = COLOR_RED if (c + r) % 2 == 0 else COLOR_ORANGE
+                    grid[r][c] = COLOR_YELLOW if (c + r) % 2 == 0 else COLOR_ORANGE
 
         elif suite_id == "heart_bloom":
-            # Suite 2: Heart Blossom & Warm Spectrum (62=Heart, 63=Red, 64=Orange)
+            # Suite 2: Heart Blossom & Warm Spectrum (64=Orange, 63=Red, 62=Heart)
             for r in range(height):
                 for c in range(width):
                     dx = abs(c - cx) / (width / 2.0)
                     dy = abs(r - cy) / (height / 2.0)
                     m_dist = dx + dy
                     if m_dist < 0.55:
-                        grid[r][c] = 62  # Heart on Note / ° on Flagship
+                        grid[r][c] = COLOR_ORANGE
                     elif m_dist < 1.05:
                         grid[r][c] = COLOR_RED
                     else:
-                        grid[r][c] = COLOR_ORANGE
+                        grid[r][c] = 62  # Heart on Note / ° on Flagship
 
         else:
-            # Suite: Architectural Color Columns
+            # Suite: Architectural Color Columns (Yellow & Orange)
             for r in range(height):
                 for c in range(width):
-                    grid[r][c] = COLOR_RED if (c // 2) % 2 == 0 else COLOR_ORANGE
+                    grid[r][c] = COLOR_YELLOW if (c // 2) % 2 == 0 else COLOR_ORANGE
 
         return grid
 

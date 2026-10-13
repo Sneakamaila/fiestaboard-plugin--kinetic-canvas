@@ -221,10 +221,10 @@ def test_zen_snap_calibration_mode():
     assert "[Flap-Test Setup]" in res0.title
     prev_note = res0.note_matrix
 
-    # Step 1: Rot (63) -> Orange (64)
+    # Step 1: Gelb (65) -> Orange (64)
     res1 = gen.generate(res0.flagship_matrix, prev_note, {"chime_style": "snap_calibration"}, state)
     assert "[Flap-Test #1/" in res1.title
-    assert "Rot (63) -> Orange (64)" in res1.title
+    assert "Gelb (65) -> Orange (64)" in res1.title
     assert res1.note_matrix[0][0] == 64
     assert calculate_flap_distance(prev_note[0][0], res1.note_matrix[0][0]) == 1
 
@@ -233,14 +233,15 @@ def test_get_next_flap_cyclic_accuracy():
     """Verify physical flap successor behavior at wrap boundaries and color sectors."""
     from plugins.kinetic_canvas.constants import get_next_flap
 
-    # Colors
-    assert get_next_flap(63) == 64  # Red -> Orange
-    assert get_next_flap(69) == 0   # White -> Blank (Physical wrap around to flap 0!)
-    assert get_next_flap(0) == 1    # Blank -> 'A'
-    assert get_next_flap(70) == 1   # Code 70 alias maps to Blank -> 'A'
-    assert get_next_flap(26) == 27  # 'Z' -> '1'
-    assert get_next_flap(36) == 37  # '0' -> '!'
-    assert get_next_flap(62) == 63  # Heart / Degree -> Red
+    # True physical rotation direction
+    assert get_next_flap(65) == 64  # Yellow -> Orange
+    assert get_next_flap(64) == 63  # Orange -> Red
+    assert get_next_flap(63) == 62  # Red -> Heart / Degree
+    assert get_next_flap(1) == 0    # 'A' -> Blank
+    assert get_next_flap(0) == 69   # Blank -> White (Physical wrap around to flap 0: White!)
+    assert get_next_flap(70) == 69  # Code 70 alias maps to Blank -> White
+    assert get_next_flap(27) == 26  # '1' -> 'Z'
+    assert get_next_flap(37) == 36  # '!' -> '0'
 
 
 def test_mondrian_note_layout_no_horizontal_lines():

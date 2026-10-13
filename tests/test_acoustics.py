@@ -29,20 +29,24 @@ def test_calculate_flap_distance_same_code():
 
 def test_calculate_flap_distance_forward_step():
     """Consecutive codes in physical sequence should produce exact delta."""
-    # Letters: A (1) to B (2) -> 1 step
-    assert calculate_flap_distance(1, 2) == 1
-    # Red (63) to Orange (64) -> 1 step
-    assert calculate_flap_distance(COLOR_RED, COLOR_ORANGE) == 1
+    # Letters: B (2) to A (1) -> 1 step
+    assert calculate_flap_distance(2, 1) == 1
+    # A (1) to Blank (0) -> 1 step
+    assert calculate_flap_distance(1, 0) == 1
+    # Blank (0) to White (69) -> 1 step
+    assert calculate_flap_distance(0, COLOR_WHITE) == 1
+    # Yellow (65) to Orange (64) -> 1 step
+    assert calculate_flap_distance(COLOR_YELLOW, COLOR_ORANGE) == 1
+    # Orange (64) to Red (63) -> 1 step
+    assert calculate_flap_distance(COLOR_ORANGE, COLOR_RED) == 1
 
 
 def test_calculate_flap_distance_wrap_around():
     """Moving backward in the drum index wraps around cyclically."""
-    # B (2) to A (1) wraps full circle minus 1
-    assert calculate_flap_distance(2, 1) == FLAP_COUNT - 1
-    # White (69) to Blank (0) is 1 step forward on the drum
-    assert calculate_flap_distance(COLOR_WHITE, 0) == 1
-    # Blank (0) to 'A' (1) is 1 step forward on the drum
-    assert calculate_flap_distance(0, 1) == 1
+    # A (1) to B (2) wraps full circle minus 1
+    assert calculate_flap_distance(1, 2) == FLAP_COUNT - 1
+    # White (69) to Blank (0) wraps full circle minus 1
+    assert calculate_flap_distance(COLOR_WHITE, 0) == FLAP_COUNT - 1
 
 
 def test_compute_acoustic_score_silent():
@@ -58,11 +62,11 @@ def test_compute_acoustic_score_silent():
 
 def test_compute_acoustic_score_whisper():
     """Small shifts produce Whisper intensity."""
-    prev = [[1 for _ in range(FLAGSHIP_WIDTH)] for _ in range(FLAGSHIP_HEIGHT)]
-    curr = [[1 for _ in range(FLAGSHIP_WIDTH)] for _ in range(FLAGSHIP_HEIGHT)]
-    # Change only 2 modules by 1 step (A to B)
-    curr[0][0] = 2  # A (1) -> B (2) is 1 step
-    curr[0][1] = 2
+    prev = [[2 for _ in range(FLAGSHIP_WIDTH)] for _ in range(FLAGSHIP_HEIGHT)]
+    curr = [[2 for _ in range(FLAGSHIP_WIDTH)] for _ in range(FLAGSHIP_HEIGHT)]
+    # Change only 2 modules by 1 step (B to A)
+    curr[0][0] = 1  # B (2) -> A (1) is 1 step in physical rotation
+    curr[0][1] = 1
 
     score = compute_acoustic_score(prev, curr)
     assert score.total_clicks == 2
@@ -72,9 +76,9 @@ def test_compute_acoustic_score_whisper():
 
 def test_compute_acoustic_score_heavy():
     """Large shifts across all modules produce Crescendo or Thunder."""
-    prev = [[1 for _ in range(FLAGSHIP_WIDTH)] for _ in range(FLAGSHIP_HEIGHT)]
-    # All modules move from A (1) to 0 (Blank), which is FLAP_COUNT - 1 clicks
-    curr = [[0 for _ in range(FLAGSHIP_WIDTH)] for _ in range(FLAGSHIP_HEIGHT)]
+    prev = [[0 for _ in range(FLAGSHIP_WIDTH)] for _ in range(FLAGSHIP_HEIGHT)]
+    # All modules move from Blank (0) to A (1), which is FLAP_COUNT - 1 clicks
+    curr = [[1 for _ in range(FLAGSHIP_WIDTH)] for _ in range(FLAGSHIP_HEIGHT)]
 
     score = compute_acoustic_score(prev, curr)
     assert score.total_clicks > 2500
